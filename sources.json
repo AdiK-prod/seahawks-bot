@@ -1,10 +1,27 @@
 {
   "rss": [
-    { "name": "Pro Football Talk", "url": "https://profootballtalk.nbcsports.com/feed/" },
-    { "name": "Yahoo NFL", "url": "https://sports.yahoo.com/nfl/rss.xml" },
-    { "name": "CBS NFL", "url": "https://www.cbssports.com/rss/headlines/nfl/" },
-    { "name": "Seahawks.com", "url": "https://www.seahawks.com/rss/news" }
+    {
+      "name": "Pro Football Talk",
+      "url": "https://profootballtalk.nbcsports.com/feed/"
+    },
+    {
+      "name": "Yahoo NFL",
+      "url": "https://sports.yahoo.com/nfl/rss.xml"
+    },
+    {
+      "name": "CBS NFL",
+      "url": "https://www.cbssports.com/rss/headlines/nfl/"
+    },
+    {
+      "name": "Seahawks.com",
+      "url": "https://www.seahawks.com/rss/news"
+    }
   ],
-  "keywords": ["Seahawks", "Seattle", "NFL", "Hawks"],
+  "keywords": [
+    "Seahawks",
+    "Seattle",
+    "NFL",
+    "Hawks"
+  ],
   "tweet_tone": "hot_take"
 }
