@@ -76,6 +76,8 @@ Output ONLY one word: "hebrew" or "english"`;
 export interface GeneratedTweet {
   text: string;
   language: "hebrew" | "english";
+  tone: string;
+  reasoning: string;
 }
 
 export async function generateTweet(articles: Article[]): Promise<GeneratedTweet> {
@@ -115,12 +117,18 @@ RULES:
 - Do NOT start with "אני חושב" / "I think" or "In my opinion"
 - Pick ONE angle — don't try to cover everything
 ${languageInstruction}
-- Output ONLY the tweet text, nothing else`;
+- Output your response in this exact format:
+REASONING: (1-2 sentences: which story you picked and why, what angle you chose)
+TWEET: (the tweet text only)`;
 
   const user = `Today's NFL/Seahawks news:\n${digest}\n\nWrite a tweet with a sharp opinion on the most interesting story.`;
 
-  const text = await callClaude(system, user);
-  return { text, language };
+  const raw = await callClaude(system, user);
+  const reasoningMatch = raw.match(/REASONING:\s*(.+?)\n?TWEET:/s);
+  const tweetMatch = raw.match(/TWEET:\s*([\s\S]+)$/);
+  const reasoning = reasoningMatch ? reasoningMatch[1].trim() : "";
+  const text = tweetMatch ? tweetMatch[1].trim() : raw.trim();
+  return { text, language, tone: getTweetTone(), reasoning };
 }
 
 // ── Quote tweet generation ────────────────────────────────────────────────────
@@ -164,7 +172,7 @@ ${languageInstruction}
   const user = `Tweet${author} being quoted:\n"${source.tweetText}"\n\nWrite a quote-tweet reaction.`;
 
   const text = await callClaude(system, user);
-  return { text, language };
+  return { text, language, tone: getTweetTone(), reasoning: "" };
 }
 
 // ── Comment classification ────────────────────────────────────────────────────
