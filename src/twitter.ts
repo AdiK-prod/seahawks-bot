@@ -15,8 +15,13 @@ function getClient(): TwitterApiReadWrite {
 
 export async function postTweet(text: string): Promise<string> {
   const client = getClient();
-  const result = await client.v2.tweet(text);
-  return result.data.id;
+  try {
+    const result = await client.v2.tweet(text);
+    return result.data.id;
+  } catch (e: any) {
+    console.error("Twitter error details:", JSON.stringify(e?.data || e?.message || e, null, 2));
+    throw e;
+  }
 }
 
 export async function likeTweet(tweetId: string): Promise<void> {
