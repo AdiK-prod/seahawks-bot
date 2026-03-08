@@ -1,0 +1,7 @@
+node_modules/
+dist/
+.env
+.env.local
+
+# Keep voice profile, ignore raw tweet data (personal)
+voice/my-tweets.txt

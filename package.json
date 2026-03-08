@@ -1,0 +1,22 @@
+{
+  "name": "seahawks-bot",
+  "version": "1.0.0",
+  "description": "Seahawks opinion bot — auto-tweet + comment interaction",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "tweet": "ts-node src/tweet.ts",
+    "engage": "ts-node src/engage.ts",
+    "dry-tweet": "DRY_RUN=true ts-node src/tweet.ts",
+    "dry-engage": "DRY_RUN=true ts-node src/engage.ts"
+  },
+  "dependencies": {
+    "rss-parser": "^3.13.0",
+    "twitter-api-v2": "^1.17.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.0.0"
+  }
+}

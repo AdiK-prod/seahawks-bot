@@ -1,0 +1,10 @@
+{
+  "rss": [
+    { "name": "Field Gulls",        "url": "https://www.fieldgulls.com/rss/current" },
+    { "name": "Pro Football Talk",  "url": "https://profootballtalk.nbcsports.com/feed/" },
+    { "name": "NFL.com",            "url": "https://www.nfl.com/rss/rsslanding?searchString=news" },
+    { "name": "Seahawks Wire",      "url": "https://seahawkswire.usatoday.com/feed/" }
+  ],
+  "keywords": ["Seahawks", "Seattle", "NFL", "Hawks"],
+  "tweet_tone": "hot_take"
+}

@@ -1,0 +1,52 @@
+name: 💬 Engage — Seahawks Opinion Bot
+
+on:
+  schedule:
+    - cron: "0 14 * * *"   # 14:00 UTC = 9 AM ET   (check morning tweet replies)
+    - cron: "0 18 * * *"   # 18:00 UTC = 1 PM ET   (midday check)
+    - cron: "0 0 * * *"    # 00:00 UTC = 7 PM ET   (check evening tweet replies)
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Dry run (don't actually post)"
+        required: false
+        default: "true"
+        type: choice
+        options: ["true", "false"]
+
+jobs:
+  engage:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run engagement job
+        run: npm run engage
+        env:
+          TWITTER_API_KEY: ${{ secrets.TWITTER_API_KEY }}
+          TWITTER_API_SECRET: ${{ secrets.TWITTER_API_SECRET }}
+          TWITTER_ACCESS_TOKEN: ${{ secrets.TWITTER_ACCESS_TOKEN }}
+          TWITTER_ACCESS_TOKEN_SECRET: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
+
+      - name: Commit updated state
+        run: |
+          git config user.name  "seahawks-bot[bot]"
+          git config user.email "bot@noreply.github.com"
+          git add state.json
+          git diff --staged --quiet || git commit -m "chore: update state after engagement [skip ci]"
+          git push

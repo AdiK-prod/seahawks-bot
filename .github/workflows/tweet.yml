@@ -1,0 +1,51 @@
+name: 🦅 Tweet — Seahawks Opinion Bot
+
+on:
+  schedule:
+    - cron: "0 12 * * *"   # 12:00 UTC = 7 AM ET  (morning take)
+    - cron: "0 22 * * *"   # 22:00 UTC = 5 PM ET  (evening take)
+  workflow_dispatch:         # Manual trigger for testing
+    inputs:
+      dry_run:
+        description: "Dry run (don't actually post)"
+        required: false
+        default: "false"
+        type: choice
+        options: ["true", "false"]
+
+jobs:
+  tweet:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write        # needed to commit state.json back
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tweet job
+        run: npm run tweet
+        env:
+          TWITTER_API_KEY: ${{ secrets.TWITTER_API_KEY }}
+          TWITTER_API_SECRET: ${{ secrets.TWITTER_API_SECRET }}
+          TWITTER_ACCESS_TOKEN: ${{ secrets.TWITTER_ACCESS_TOKEN }}
+          TWITTER_ACCESS_TOKEN_SECRET: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
+
+      - name: Commit updated state
+        run: |
+          git config user.name  "seahawks-bot[bot]"
+          git config user.email "bot@noreply.github.com"
+          git add state.json
+          git diff --staged --quiet || git commit -m "chore: update state after tweet [skip ci]"
+          git push
