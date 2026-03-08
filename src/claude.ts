@@ -33,7 +33,7 @@ async function callClaude(system: string, user: string): Promise<string> {
     throw new Error(`Claude API error ${response.status}: ${err}`);
   }
 
-  const data = await response.json();
+  const data = await response.json() as { content: { text: string }[] };
   return data.content[0].text.trim();
 }
 
