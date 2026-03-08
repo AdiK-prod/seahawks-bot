@@ -1,4 +1,20 @@
 {
-  "seen_articles": [],
-  "posted_tweets": []
+  "seen_articles": [
+    "https://www.nbcsports.com/nfl/profootballtalk/rumor-mill/news/report-rams-trent-mcduffie-progressing-toward-contract-extension",
+    "https://sports.yahoo.com/articles/report-rams-trent-mcduffie-progressing-223148320.html",
+    "https://sports.yahoo.com/articles/cardinals-cb-sean-murphy-bunting-221404460.html",
+    "https://sports.yahoo.com/articles/denver-broncos-offseason-roster-thoughts-220000898.html",
+    "https://sports.yahoo.com/articles/linebackers-operate-las-vegas-raiders-215000759.html",
+    "https://sports.yahoo.com/articles/eagles-trade-jalen-carter-must-214127235.html",
+    "https://sports.yahoo.com/articles/seahawks-free-agency-2026-rumors-213730732.html",
+    "\n                                                https://www.cbssports.com/nfl/news/2026-nfl-free-agency-primer-cap-space-for-all-32-teams/\n                    "
+  ],
+  "posted_tweets": [
+    {
+      "id": "2030782074496651582",
+      "text": "הראמס מקבלים את מקדאפי בחינם כי הם מפחדים מהמכירה הפומבית. זה לא מהלך חכם, זה פאניקה של פרונט אופיס שיודע שהקורנרבק שלהם לא יחזיק מעמד עוד שנה.",
+      "posted_at": "2026-03-08T23:05:51.450Z",
+      "engaged_comment_ids": []
+    }
+  ]
 }
