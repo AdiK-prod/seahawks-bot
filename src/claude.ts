@@ -22,7 +22,7 @@ async function callClaude(system: string, user: string): Promise<string> {
     },
     body: JSON.stringify({
       model: "claude-sonnet-4-20250514",
-      max_tokens: 300,
+      max_tokens: 400,
       system,
       messages: [{ role: "user", content: user }],
     }),
@@ -37,14 +37,45 @@ async function callClaude(system: string, user: string): Promise<string> {
   return data.content[0].text.trim();
 }
 
+// ── Language decision ─────────────────────────────────────────────────────────
+
+async function decideLanguage(content: string): Promise<"hebrew" | "english"> {
+  const system = `You decide whether a Seahawks/NFL tweet should be written in Hebrew or English.
+
+RULES:
+- Default is HEBREW — this account primarily speaks Hebrew
+- Use ENGLISH only when the topic is a proper noun-heavy stat line, a direct quote, or content where Hebrew would lose significant meaning (e.g., "4th and 1 from the 32" plays better in English)
+- When in doubt, choose HEBREW
+
+Output ONLY one word: "hebrew" or "english"`;
+
+  const result = await callClaude(system, `Topic/content:\n${content}`);
+  return result.toLowerCase().includes("english") ? "english" : "hebrew";
+}
+
 // ── Tweet generation ──────────────────────────────────────────────────────────
 
-export async function generateTweet(articles: Article[]): Promise<string> {
+export interface GeneratedTweet {
+  text: string;
+  language: "hebrew" | "english";
+}
+
+export async function generateTweet(articles: Article[]): Promise<GeneratedTweet> {
   const voiceProfile = getVoiceProfile();
   const digest = articles
     .slice(0, 6)
     .map((a) => `• [${a.source}] ${a.title}: ${a.content.slice(0, 150)}`)
     .join("\n");
+
+  const topStory = articles[0] ? `${articles[0].title}: ${articles[0].content}` : digest;
+  const language = await decideLanguage(topStory);
+
+  const languageInstruction = language === "hebrew"
+    ? `- Write in HEBREW (עברית). RTL text, natural Israeli tone.
+- Hebrew slang and football terms are fine (e.g., "קוורטרבק", "דראפט", "פליאאוף")
+- Max 260 characters (Hebrew chars count the same)`
+    : `- Write in ENGLISH
+- Max 260 characters`;
 
   const system = `You are ghostwriting a tweet for a specific person.
 
@@ -52,18 +83,59 @@ THEIR VOICE PROFILE:
 ${voiceProfile}
 
 RULES:
-- Write EXACTLY ONE tweet, max 260 characters
+- Write EXACTLY ONE tweet
 - Sound like a strong opinion, not a news recap
 - Match their vocabulary, sentence rhythm, and tone precisely
 - No hashtags
 - No emojis unless they use them in their profile
-- Do NOT start with "I think" or "In my opinion"
+- Do NOT start with "אני חושב" / "I think" or "In my opinion"
 - Pick ONE angle — don't try to cover everything
+${languageInstruction}
 - Output ONLY the tweet text, nothing else`;
 
   const user = `Today's NFL/Seahawks news:\n${digest}\n\nWrite a tweet with a sharp opinion on the most interesting story.`;
 
-  return callClaude(system, user);
+  const text = await callClaude(system, user);
+  return { text, language };
+}
+
+// ── Quote tweet generation ────────────────────────────────────────────────────
+
+export interface QuoteTweetSource {
+  tweetId: string;
+  tweetText: string;
+  tweetAuthor?: string;
+}
+
+export async function generateQuoteTweet(source: QuoteTweetSource): Promise<GeneratedTweet> {
+  const voiceProfile = getVoiceProfile();
+
+  const language = await decideLanguage(source.tweetText);
+
+  const languageInstruction = language === "hebrew"
+    ? `- Write in HEBREW (עברית). Natural Israeli football fan tone.
+- Max 240 characters`
+    : `- Write in ENGLISH
+- Max 240 characters`;
+
+  const system = `You are ghostwriting a quote-tweet for a specific person. A quote-tweet adds your own comment on top of someone else's tweet.
+
+THEIR VOICE PROFILE:
+${voiceProfile}
+
+RULES:
+- Write a sharp reaction or counter-opinion to the tweet being quoted
+- Sound like them — opinionated, direct, no hedging
+- No hashtags
+- The quoted tweet is already attached, so don't repeat its content — react to it
+${languageInstruction}
+- Output ONLY the quote-tweet text, nothing else`;
+
+  const author = source.tweetAuthor ? ` by @${source.tweetAuthor}` : "";
+  const user = `Tweet${author} being quoted:\n"${source.tweetText}"\n\nWrite a quote-tweet reaction.`;
+
+  const text = await callClaude(system, user);
+  return { text, language };
 }
 
 // ── Comment classification ────────────────────────────────────────────────────
@@ -86,13 +158,13 @@ export async function classifyComments(
     .map((c, i) => `${i + 1}. [id:${c.id}] "${c.text}"`)
     .join("\n");
 
-  const system = `You classify tweets/replies for a Seahawks fan account. 
+  const system = `You classify tweets/replies for a Seahawks fan account.
 Return ONLY valid JSON — an array of objects, one per comment.
 Each object: { "id": "...", "category": "..." }
 Categories:
 - "supportive": agrees, cheers, positive vibes → we should LIKE this
 - "question": asks something genuine → we should REPLY
-- "reply_worthy": interesting debate, pushback worth engaging → we should REPLY  
+- "reply_worthy": interesting debate, pushback worth engaging → we should REPLY
 - "troll": insults, bad faith, spam → IGNORE
 - "neutral": generic reaction, not worth engaging → IGNORE
 Output ONLY the JSON array, no markdown, no explanation.`;
@@ -120,10 +192,16 @@ export async function generateReply(
 ): Promise<string> {
   const voiceProfile = getVoiceProfile();
 
+  const language = await decideLanguage(comment);
+
   const toneGuide =
     category === "question"
       ? "Answer their question directly and confidently. Add your opinion."
       : "Engage with their point. Agree, push back, or add nuance — but commit to a stance.";
+
+  const languageInstruction = language === "hebrew"
+    ? "- Write in HEBREW (עברית) — the commenter wrote in Hebrew, reply in Hebrew"
+    : "- Write in ENGLISH — the commenter wrote in English, reply in English";
 
   const system = `You are ghostwriting a reply tweet for a specific person.
 
@@ -135,6 +213,7 @@ RULES:
 - Sound like them, not a PR account
 - ${toneGuide}
 - No hashtags
+${languageInstruction}
 - Output ONLY the reply text, nothing else`;
 
   const user = `Their original tweet: "${originalTweet}"

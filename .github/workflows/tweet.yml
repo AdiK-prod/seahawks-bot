@@ -4,7 +4,7 @@ on:
   schedule:
     - cron: "0 12 * * *"   # 12:00 UTC = 7 AM ET  (morning take)
     - cron: "0 22 * * *"   # 22:00 UTC = 5 PM ET  (evening take)
-  workflow_dispatch:         # Manual trigger for testing
+  workflow_dispatch:
     inputs:
       dry_run:
         description: "Dry run (don't actually post)"
@@ -12,12 +12,24 @@ on:
         default: "false"
         type: choice
         options: ["true", "false"]
+      quote_tweet_id:
+        description: "Tweet ID to quote (optional — leave blank for regular tweet)"
+        required: false
+        default: ""
+      quote_tweet_text:
+        description: "Text of the tweet being quoted (required if quoting)"
+        required: false
+        default: ""
+      quote_tweet_author:
+        description: "Author handle of quoted tweet e.g. nflnetwork (optional)"
+        required: false
+        default: ""
 
 jobs:
   tweet:
     runs-on: ubuntu-latest
     permissions:
-      contents: write        # needed to commit state.json back
+      contents: write
 
     steps:
       - name: Checkout repo
@@ -27,7 +39,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "20"
-          cache: "npm"
 
       - name: Install dependencies
         run: npm ci
@@ -41,6 +52,9 @@ jobs:
           TWITTER_ACCESS_TOKEN_SECRET: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
+          QUOTE_TWEET_ID: ${{ github.event.inputs.quote_tweet_id || '' }}
+          QUOTE_TWEET_TEXT: ${{ github.event.inputs.quote_tweet_text || '' }}
+          QUOTE_TWEET_AUTHOR: ${{ github.event.inputs.quote_tweet_author || '' }}
 
       - name: Commit updated state
         run: |
