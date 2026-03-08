@@ -3,6 +3,7 @@ import path from "path";
 import { Article } from "./state";
 
 const VOICE_PROFILE_PATH = path.join(process.cwd(), "voice/voice-profile.md");
+const SOURCES_CONFIG_PATH = path.join(process.cwd(), "sources.json");
 
 function getVoiceProfile(): string {
   try {
@@ -11,6 +12,22 @@ function getVoiceProfile(): string {
     return "Passionate, analytical Seahawks fan. Short declarative opinions. No hedging.";
   }
 }
+
+function getTweetTone(): string {
+  try {
+    const config = JSON.parse(fs.readFileSync(SOURCES_CONFIG_PATH, "utf-8"));
+    return config.tweet_tone || "hot_take";
+  } catch {
+    return "hot_take";
+  }
+}
+
+const TONE_INSTRUCTIONS: Record<string, string> = {
+  hot_take:   "Strong, provocative opinion. Confident. Willing to be controversial.",
+  analytical: "Data-driven and reasoned. Break down WHY something is happening. Cite specifics.",
+  frustrated: "Venting frustration. Direct criticism. No sugarcoating.",
+  optimistic: "Positive spin. Find the silver lining. Rally the fans.",
+};
 
 async function callClaude(system: string, user: string): Promise<string> {
   const response = await fetch("https://api.anthropic.com/v1/messages", {
@@ -43,9 +60,10 @@ async function decideLanguage(content: string): Promise<"hebrew" | "english"> {
   const system = `You decide whether a Seahawks/NFL tweet should be written in Hebrew or English.
 
 RULES:
-- Default is HEBREW — this account primarily speaks Hebrew
-- Use ENGLISH only when the topic is a proper noun-heavy stat line, a direct quote, or content where Hebrew would lose significant meaning (e.g., "4th and 1 from the 32" plays better in English)
-- When in doubt, choose HEBREW
+- DEFAULT IS HEBREW. Always. This is a Hebrew-language account.
+- Use ENGLISH only in rare cases: a direct quote that must stay verbatim in English, or a technical stat line (e.g., "3rd & 1 from the 22") where the numbers and yard-line notation would be confusing in Hebrew.
+- Opinions, takes, reactions, analysis → ALWAYS HEBREW.
+- If you are not 100% sure English is necessary → HEBREW.
 
 Output ONLY one word: "hebrew" or "english"`;
 
@@ -62,6 +80,9 @@ export interface GeneratedTweet {
 
 export async function generateTweet(articles: Article[]): Promise<GeneratedTweet> {
   const voiceProfile = getVoiceProfile();
+  const tone = getTweetTone();
+  const toneInstruction = TONE_INSTRUCTIONS[tone] || TONE_INSTRUCTIONS.hot_take;
+
   const digest = articles
     .slice(0, 6)
     .map((a) => `• [${a.source}] ${a.title}: ${a.content.slice(0, 150)}`)
@@ -71,7 +92,7 @@ export async function generateTweet(articles: Article[]): Promise<GeneratedTweet
   const language = await decideLanguage(topStory);
 
   const languageInstruction = language === "hebrew"
-    ? `- Write in HEBREW (עברית). RTL text, natural Israeli tone.
+    ? `- Write in HEBREW (עברית). RTL text, natural Israeli football fan tone.
 - Hebrew slang and football terms are fine (e.g., "קוורטרבק", "דראפט", "פליאאוף")
 - Max 260 characters (Hebrew chars count the same)`
     : `- Write in ENGLISH
@@ -82,8 +103,11 @@ export async function generateTweet(articles: Article[]): Promise<GeneratedTweet
 THEIR VOICE PROFILE:
 ${voiceProfile}
 
+TONE FOR THIS TWEET: ${toneInstruction}
+
 RULES:
 - Write EXACTLY ONE tweet
+- Apply the tone above — it should be obvious in the writing style
 - Sound like a strong opinion, not a news recap
 - Match their vocabulary, sentence rhythm, and tone precisely
 - No hashtags
@@ -109,6 +133,8 @@ export interface QuoteTweetSource {
 
 export async function generateQuoteTweet(source: QuoteTweetSource): Promise<GeneratedTweet> {
   const voiceProfile = getVoiceProfile();
+  const tone = getTweetTone();
+  const toneInstruction = TONE_INSTRUCTIONS[tone] || TONE_INSTRUCTIONS.hot_take;
 
   const language = await decideLanguage(source.tweetText);
 
@@ -118,13 +144,16 @@ export async function generateQuoteTweet(source: QuoteTweetSource): Promise<Gene
     : `- Write in ENGLISH
 - Max 240 characters`;
 
-  const system = `You are ghostwriting a quote-tweet for a specific person. A quote-tweet adds your own comment on top of someone else's tweet.
+  const system = `You are ghostwriting a quote-tweet for a specific person.
 
 THEIR VOICE PROFILE:
 ${voiceProfile}
 
+TONE FOR THIS TWEET: ${toneInstruction}
+
 RULES:
 - Write a sharp reaction or counter-opinion to the tweet being quoted
+- Apply the tone above
 - Sound like them — opinionated, direct, no hedging
 - No hashtags
 - The quoted tweet is already attached, so don't repeat its content — react to it
