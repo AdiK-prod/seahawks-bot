@@ -5,14 +5,48 @@ import {
   isArticleNew,
   markArticlesSeen,
   addPostedTweet,
+  getRecentTweets,
 } from "./state";
 
 const DRY_RUN = process.env.DRY_RUN === "true";
-
-// Optional: set QUOTE_TWEET_ID and QUOTE_TWEET_TEXT env vars to do a quote tweet instead
 const QUOTE_TWEET_ID = process.env.QUOTE_TWEET_ID;
 const QUOTE_TWEET_TEXT = process.env.QUOTE_TWEET_TEXT;
 const QUOTE_TWEET_AUTHOR = process.env.QUOTE_TWEET_AUTHOR;
+
+const SIMILARITY_THRESHOLD = 0.4; // 40% word overlap = too similar
+
+function tokenize(text: string): Set<string> {
+  return new Set(
+    text
+      .toLowerCase()
+      .replace(/[^a-z0-9\u0590-\u05ff\s]/g, "") // keep Hebrew + English
+      .split(/\s+/)
+      .filter((w) => w.length > 3) // ignore short words
+  );
+}
+
+function jaccardSimilarity(a: string, b: string): number {
+  const setA = tokenize(a);
+  const setB = tokenize(b);
+  if (setA.size === 0 || setB.size === 0) return 0;
+  const intersection = new Set([...setA].filter((w) => setB.has(w)));
+  const union = new Set([...setA, ...setB]);
+  return intersection.size / union.size;
+}
+
+function isTooSimilarToRecent(candidate: string): boolean {
+  const recentTweets = getRecentTweets(48); // last 48 hours
+  for (const tweet of recentTweets) {
+    const score = jaccardSimilarity(candidate, tweet.text);
+    if (score >= SIMILARITY_THRESHOLD) {
+      console.log(
+        `  ⚠ Too similar to recent tweet (score: ${score.toFixed(2)}): "${tweet.text.slice(0, 60)}…"`
+      );
+      return true;
+    }
+  }
+  return false;
+}
 
 async function main() {
   console.log(`\n🦅 SEAHAWKS BOT — TWEET JOB ${DRY_RUN ? "[DRY RUN]" : ""}`);
@@ -74,6 +108,14 @@ async function main() {
       console.error("  ✗ Tweet too long! Aborting.");
       process.exit(1);
     }
+
+    // ── Similarity check ──────────────────────────────────────────────────────
+    console.log("\n  Checking similarity against recent tweets...");
+    if (isTooSimilarToRecent(tweetText)) {
+      console.log("  Skipping — too similar to a recent tweet.");
+      return;
+    }
+    console.log("  ✓ Unique enough to post.");
 
     if (DRY_RUN) {
       console.log("\n[3/3] [DRY RUN] Would post tweet above. Not posting.");
