@@ -2,8 +2,14 @@ name: 🦅 Tweet — Seahawks Opinion Bot
 
 on:
   schedule:
-    - cron: "0 12 * * *"
-    - cron: "0 22 * * *"
+    - cron: "0 6 * * *"    # 08:00 IL
+    - cron: "0 8 * * *"    # 10:00 IL
+    - cron: "0 10 * * *"   # 12:00 IL
+    - cron: "0 12 * * *"   # 14:00 IL
+    - cron: "0 14 * * *"   # 16:00 IL
+    - cron: "0 16 * * *"   # 18:00 IL
+    - cron: "0 18 * * *"   # 20:00 IL
+    - cron: "0 20 * * *"   # 22:00 IL
   workflow_dispatch:
     inputs:
       dry_run:
@@ -59,6 +65,14 @@ jobs:
           QUOTE_TWEET_ID: ${{ github.event.inputs.quote_tweet_id || '' }}
           QUOTE_TWEET_TEXT: ${{ github.event.inputs.quote_tweet_text || '' }}
           QUOTE_TWEET_AUTHOR: ${{ github.event.inputs.quote_tweet_author || '' }}
+
+      - name: Upload tweet log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tweet-log-${{ github.run_id }}
+          path: logs/
+          retention-days: 30
 
       - name: Commit updated state
         run: |

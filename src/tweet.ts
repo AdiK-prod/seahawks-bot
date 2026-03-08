@@ -1,3 +1,5 @@
+import fs from "fs";
+import path from "path";
 import { fetchArticles } from "./sources";
 import { generateTweet, generateQuoteTweet, QuoteTweetSource } from "./claude";
 import { postTweet, quoteTweet } from "./twitter";
@@ -13,15 +15,40 @@ const QUOTE_TWEET_ID = process.env.QUOTE_TWEET_ID;
 const QUOTE_TWEET_TEXT = process.env.QUOTE_TWEET_TEXT;
 const QUOTE_TWEET_AUTHOR = process.env.QUOTE_TWEET_AUTHOR;
 
-const SIMILARITY_THRESHOLD = 0.4; // 40% word overlap = too similar
+const SIMILARITY_THRESHOLD = 0.4;
+const LOG_DIR = path.join(process.cwd(), "logs");
+
+// ── Logger ────────────────────────────────────────────────────────────────────
+
+function createLogger() {
+  if (!fs.existsSync(LOG_DIR)) fs.mkdirSync(LOG_DIR, { recursive: true });
+
+  const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+  const logPath = path.join(LOG_DIR, `tweet-${timestamp}.md`);
+  const lines: string[] = [];
+
+  const log = (line = "") => {
+    console.log(line);
+    lines.push(line);
+  };
+
+  const save = () => {
+    fs.writeFileSync(logPath, lines.join("\n"), "utf-8");
+    console.log(`\n📋 Log saved: logs/tweet-${timestamp}.md`);
+  };
+
+  return { log, save, logPath };
+}
+
+// ── Similarity ────────────────────────────────────────────────────────────────
 
 function tokenize(text: string): Set<string> {
   return new Set(
     text
       .toLowerCase()
-      .replace(/[^a-z0-9\u0590-\u05ff\s]/g, "") // keep Hebrew + English
+      .replace(/[^a-z0-9\u0590-\u05ff\s]/g, "")
       .split(/\s+/)
-      .filter((w) => w.length > 3) // ignore short words
+      .filter((w) => w.length > 3)
   );
 }
 
@@ -34,23 +61,28 @@ function jaccardSimilarity(a: string, b: string): number {
   return intersection.size / union.size;
 }
 
-function isTooSimilarToRecent(candidate: string): boolean {
-  const recentTweets = getRecentTweets(48); // last 48 hours
+function isTooSimilarToRecent(candidate: string, log: (s?: string) => void): boolean {
+  const recentTweets = getRecentTweets(48);
   for (const tweet of recentTweets) {
     const score = jaccardSimilarity(candidate, tweet.text);
     if (score >= SIMILARITY_THRESHOLD) {
-      console.log(
-        `  ⚠ Too similar to recent tweet (score: ${score.toFixed(2)}): "${tweet.text.slice(0, 60)}…"`
-      );
+      log(`  ⚠ Too similar (score: ${score.toFixed(2)}) to: "${tweet.text.slice(0, 80)}…"`);
       return true;
     }
   }
   return false;
 }
 
+// ── Main ──────────────────────────────────────────────────────────────────────
+
 async function main() {
-  console.log(`\n🦅 SEAHAWKS BOT — TWEET JOB ${DRY_RUN ? "[DRY RUN]" : ""}`);
-  console.log("─".repeat(50));
+  const { log, save } = createLogger();
+
+  const runAt = new Date().toISOString();
+  log(`# 🦅 Seahawks Bot — Tweet Log`);
+  log(`**Run:** ${runAt}${DRY_RUN ? " [DRY RUN]" : ""}`);
+  log();
+  log("---");
 
   let tweetText: string;
   let language: string;
@@ -58,78 +90,115 @@ async function main() {
 
   // ── Quote tweet mode ────────────────────────────────────────────────────────
   if (QUOTE_TWEET_ID && QUOTE_TWEET_TEXT) {
-    console.log("\n[MODE] Quote tweet");
+    log();
+    log("## Mode: Quote Tweet");
+    log(`**Quoting:** "${QUOTE_TWEET_TEXT}"${QUOTE_TWEET_AUTHOR ? ` by @${QUOTE_TWEET_AUTHOR}` : ""}`);
+
+    log();
+    log("## Generating via Claude...");
     const source: QuoteTweetSource = {
       tweetId: QUOTE_TWEET_ID,
       tweetText: QUOTE_TWEET_TEXT,
       tweetAuthor: QUOTE_TWEET_AUTHOR,
     };
-
-    console.log("\n[1/2] Generating quote tweet via Claude...");
     const generated = await generateQuoteTweet(source);
     tweetText = generated.text;
     language = generated.language;
 
-    console.log(`\n  Language: ${language}`);
-    console.log(`  Generated (${tweetText.length} chars):\n  "${tweetText}"`);
+    log();
+    log("## Result");
+    log(`- **Language:** ${language}`);
+    log(`- **Length:** ${tweetText.length} chars`);
+    log(`- **Tweet:** "${tweetText}"`);
 
     if (DRY_RUN) {
-      console.log("\n[DRY RUN] Would quote-tweet above. Not posting.");
+      log();
+      log("⏭ DRY RUN — not posted.");
+      save();
       return;
     }
 
-    console.log("\n[2/2] Posting quote tweet...");
     tweetId = await quoteTweet(tweetText, QUOTE_TWEET_ID);
-    console.log(`  ✓ Posted! https://twitter.com/i/web/status/${tweetId}`);
+    log(`- **Posted:** https://twitter.com/i/web/status/${tweetId}`);
 
   // ── Regular tweet mode ──────────────────────────────────────────────────────
   } else {
-    console.log("\n[MODE] Regular tweet from news");
+    log();
+    log("## Mode: Regular Tweet from News");
 
-    console.log("\n[1/3] Fetching news sources...");
+    log();
+    log("## [1/3] News Sources");
     const articles = await fetchArticles();
     const freshArticles = articles.filter((a) => a.link && isArticleNew(a.link));
-    console.log(`  ${articles.length} total articles, ${freshArticles.length} new`);
+    log(`- Total articles fetched: **${articles.length}**`);
+    log(`- New (unseen) articles: **${freshArticles.length}**`);
 
     if (freshArticles.length === 0) {
-      console.log("  No new stories since last run. Skipping.");
+      log();
+      log("⏭ No new stories — skipping.");
+      save();
       return;
     }
 
-    console.log("\n[2/3] Generating tweet via Claude...");
+    log();
+    log("### Articles considered:");
+    freshArticles.slice(0, 6).forEach((a, i) => {
+      log(`${i + 1}. **[${a.source}]** ${a.title}`);
+      log(`   ${a.content.slice(0, 120)}…`);
+      log(`   ${a.link}`);
+    });
+
+    log();
+    log("## [2/3] Claude Generation");
     const generated = await generateTweet(freshArticles);
     tweetText = generated.text;
     language = generated.language;
 
-    console.log(`\n  Language: ${language}`);
-    console.log(`  Generated (${tweetText.length} chars):\n  "${tweetText}"`);
+    log(`- **Language decided:** ${language}`);
+    log(`- **Tone used:** ${generated.tone || "from sources.json"}`);
+    log();
+    log("### Reasoning:");
+    log(generated.reasoning || "_No reasoning returned_");
+    log();
+    log("### Generated tweet:");
+    log(`> ${tweetText}`);
+    log(`- **Length:** ${tweetText.length}/280 chars`);
 
     if (tweetText.length > 280) {
-      console.error("  ✗ Tweet too long! Aborting.");
+      log();
+      log("❌ Tweet too long — aborting.");
+      save();
       process.exit(1);
     }
 
-    // ── Similarity check ──────────────────────────────────────────────────────
-    console.log("\n  Checking similarity against recent tweets...");
-    if (isTooSimilarToRecent(tweetText)) {
-      console.log("  Skipping — too similar to a recent tweet.");
+    log();
+    log("## [3/3] Similarity Check");
+    const recentTweets = getRecentTweets(48);
+    log(`- Comparing against **${recentTweets.length}** tweets from the last 48h`);
+
+    if (isTooSimilarToRecent(tweetText, log)) {
+      log();
+      log("⏭ Skipped — too similar to a recent tweet.");
+      save();
       return;
     }
-    console.log("  ✓ Unique enough to post.");
+    log("- ✓ Unique enough to post");
 
     if (DRY_RUN) {
-      console.log("\n[3/3] [DRY RUN] Would post tweet above. Not posting.");
+      log();
+      log("⏭ DRY RUN — not posted.");
+      save();
       return;
     }
 
-    console.log("\n[3/3] Posting...");
     tweetId = await postTweet(tweetText);
-    console.log(`  ✓ Posted! https://twitter.com/i/web/status/${tweetId}`);
+    log();
+    log("## Result");
+    log(`- ✓ **Posted:** https://twitter.com/i/web/status/${tweetId}`);
 
     markArticlesSeen(freshArticles.slice(0, 8).map((a) => a.link));
   }
 
-  // Save to state
   if (tweetId) {
     addPostedTweet({
       id: tweetId,
@@ -139,7 +208,10 @@ async function main() {
     });
   }
 
-  console.log("\n✓ Done.\n");
+  log();
+  log("---");
+  log("✓ Done.");
+  save();
 }
 
 main().catch((e) => {
