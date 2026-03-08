@@ -2,8 +2,8 @@ name: 🦅 Tweet — Seahawks Opinion Bot
 
 on:
   schedule:
-    - cron: "0 12 * * *"   # 12:00 UTC = 7 AM ET  (morning take)
-    - cron: "0 22 * * *"   # 22:00 UTC = 5 PM ET  (evening take)
+    - cron: "0 12 * * *"
+    - cron: "0 22 * * *"
   workflow_dispatch:
     inputs:
       dry_run:
@@ -13,17 +13,21 @@ on:
         type: choice
         options: ["true", "false"]
       quote_tweet_id:
-        description: "Tweet ID to quote (optional — leave blank for regular tweet)"
+        description: "Tweet ID to quote (optional)"
         required: false
         default: ""
       quote_tweet_text:
-        description: "Text of the tweet being quoted (required if quoting)"
+        description: "Text of the tweet being quoted"
         required: false
         default: ""
       quote_tweet_author:
-        description: "Author handle of quoted tweet e.g. nflnetwork (optional)"
+        description: "Author handle of quoted tweet"
         required: false
         default: ""
+
+concurrency:
+  group: tweet-job
+  cancel-in-progress: false
 
 jobs:
   tweet:
@@ -62,4 +66,19 @@ jobs:
           git config user.email "bot@noreply.github.com"
           git add state.json
           git diff --staged --quiet || git commit -m "chore: update state after tweet [skip ci]"
+          git pull --rebase origin main
           git push
+
+      - name: Notify on failure
+        if: failure()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.GMAIL_USER }}
+          password: ${{ secrets.GMAIL_APP_PASSWORD }}
+          to: ${{ secrets.GMAIL_USER }}
+          subject: "🚨 Seahawks Bot failed — ${{ github.run_id }}"
+          body: |
+            The tweet job failed.
+            Run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
