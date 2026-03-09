@@ -2,6 +2,69 @@
   "version": 1,
   "tweets": [
     {
+      "id": "2031129704888152393",
+      "text": "48 מיליון לקוויטי פיי? הוא בקושי הצליח להיות רלוונטי באינדיאנפוליס ועכשיו הריידרס משלמים לו כמו All-Pro. זה בדיוק למה צוותים נשארים בבנייה מחדש - משלמים מחירי פרימיום לשחקנים ממוצעים",
+      "posted_at": "2026-03-09T22:06:53.882Z",
+      "type": "single",
+      "tone": "analytical",
+      "reasoning": "The Kwity Paye signing is the most interesting - $48M for a player who hasn't lived up to his first-round status with the Colts. This screams overpay by a desperate Raiders team.",
+      "articles_used": [
+        {
+          "title": "\n                        2026 NFL free agency live tracker: Full list of team-by-team signings and trades\n                    ",
+          "source": "CBS NFL",
+          "link": "\n                                                https://www.cbssports.com/nfl/news/nfl-free-agency-tracker-2026-full-list-signings-trades-moves/\n                    "
+        },
+        {
+          "title": "Dolphins to re-sign TE Greg Dulcich",
+          "source": "Pro Football Talk",
+          "link": "https://www.nbcsports.com/nfl/profootballtalk/rumor-mill/news/dolphins-to-re-sign-te-greg-dulcich"
+        },
+        {
+          "title": "Dolphins to re-sign TE Greg Dulcich",
+          "source": "Yahoo NFL",
+          "link": "https://sports.yahoo.com/articles/dolphins-sign-te-greg-dulcich-215806738.html"
+        },
+        {
+          "title": "Will the Jaguars trade Brian Thomas Jr.? What latest reports suggest",
+          "source": "Yahoo NFL",
+          "link": "https://sports.yahoo.com/articles/jaguars-trade-brian-thomas-jr-215634796.html"
+        },
+        {
+          "title": "Titans free agency news and rumors tracker",
+          "source": "Yahoo NFL",
+          "link": "https://sports.yahoo.com/articles/titans-free-agency-news-rumors-153308409.html"
+        },
+        {
+          "title": "Report: Former Colts 1st round DE Kwity Paye signs 3-year, $48 million free agency deal with Raiders",
+          "source": "Yahoo NFL",
+          "link": "https://sports.yahoo.com/articles/report-former-colts-1st-round-215426599.html"
+        },
+        {
+          "title": "Broncos release linebacker Dre Greenlaw",
+          "source": "Yahoo NFL",
+          "link": "https://sports.yahoo.com/articles/broncos-release-linebacker-dre-greenlaw-213758973.html"
+        },
+        {
+          "title": "Inside the Jaylen Watson deal",
+          "source": "Pro Football Talk",
+          "link": "https://www.nbcsports.com/nfl/profootballtalk/rumor-mill/news/inside-the-jaylen-watson-deal"
+        }
+      ],
+      "predicted_grade": 3,
+      "predicted_grade_reason": "Tweet is in Hebrew which severely limits engagement for a Seahawks fan account's English-speaking audience",
+      "predicted_grade_strengths": [
+        "Strong opinion on player value",
+        "Specific contract details ($48M)",
+        "Critical analysis of team building strategy"
+      ],
+      "predicted_grade_weaknesses": [
+        "Language barrier eliminates most audience",
+        "About Raiders/Colts not Seahawks",
+        "No connection to team's fanbase",
+        "Limited shareability due to language"
+      ]
+    },
+    {
       "id": "2031122336888349138",
       "text": "הליגה לא נתנה לבירס פיק קומפנסטורי על Ian Cunningham למרות שמגיע להם. אותה ליגה שנותנת פיקים על כל מנהל קפה שעובר בין קבוצות. הכללים משתנים בהתאם למה שנוח ל-NFL, כמו תמיד",
       "posted_at": "2026-03-09T21:37:37.764Z",
