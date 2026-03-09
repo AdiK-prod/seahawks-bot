@@ -1,27 +1,17 @@
 {
   "rss": [
-    {
-      "name": "Pro Football Talk",
-      "url": "https://profootballtalk.nbcsports.com/feed/"
-    },
-    {
-      "name": "Yahoo NFL",
-      "url": "https://sports.yahoo.com/nfl/rss.xml"
-    },
-    {
-      "name": "CBS NFL",
-      "url": "https://www.cbssports.com/rss/headlines/nfl/"
-    },
-    {
-      "name": "Seahawks.com",
-      "url": "https://www.seahawks.com/rss/news"
-    }
+    { "name": "Pro Football Talk", "url": "https://profootballtalk.nbcsports.com/feed/" },
+    { "name": "Yahoo NFL",         "url": "https://sports.yahoo.com/nfl/rss.xml" },
+    { "name": "CBS NFL",           "url": "https://www.cbssports.com/rss/headlines/nfl/" },
+    { "name": "Seahawks.com",      "url": "https://www.seahawks.com/rss/news" }
   ],
-  "keywords": [
-    "Seahawks",
-    "Seattle",
-    "NFL",
-    "Hawks"
+  "monitored_accounts": [
+    { "handle": "AdamSchefter",  "name": "Adam Schefter (ESPN)"        },
+    { "handle": "RapSheet",      "name": "Ian Rapoport (NFL Network)"  },
+    { "handle": "TomPelissero",  "name": "Tom Pelissero (NFL Network)" },
+    { "handle": "BobGrotkowski", "name": "Bob Condotta (Seattle Times)"},
+    { "handle": "johnlocke1609", "name": "John Boyle (Seahawks.com)"  }
   ],
+  "keywords": ["Seahawks", "Seattle", "NFL", "Hawks"],
   "tweet_tone": "analytical"
 }

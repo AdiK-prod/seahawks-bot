@@ -27,9 +27,7 @@ export async function postTweet(text: string): Promise<string> {
 export async function quoteTweet(text: string, quotedTweetId: string): Promise<string> {
   const client = getClient();
   try {
-    const result = await client.v2.tweet(text, {
-      quote_tweet_id: quotedTweetId,
-    });
+    const result = await client.v2.tweet(text, { quote_tweet_id: quotedTweetId });
     return result.data.id;
   } catch (e: any) {
     console.error("Twitter error details:", JSON.stringify(e?.data || e?.message || e, null, 2));
@@ -65,7 +63,6 @@ export async function getReplies(tweetId: string): Promise<RawComment[]> {
       "tweet.fields": ["author_id", "text", "conversation_id"],
       max_results: 20,
     });
-
     if (!results.data?.data) return [];
     return results.data.data.map((t: TweetV2) => ({
       id: t.id,
@@ -81,4 +78,53 @@ export async function getReplies(tweetId: string): Promise<RawComment[]> {
 export async function getOwnUserId(): Promise<string> {
   const me = await getClient().v2.me();
   return me.data.id;
+}
+
+export interface MonitoredTweet {
+  id: string;
+  text: string;
+  author: string;
+  created_at: string;
+}
+
+export async function getRecentTweetsFromAccounts(
+  handles: string[],
+  lookbackHours = 3
+): Promise<MonitoredTweet[]> {
+  if (handles.length === 0) return [];
+  const client = getClient();
+
+  const since = new Date(Date.now() - lookbackHours * 60 * 60 * 1000).toISOString();
+  const results: MonitoredTweet[] = [];
+
+  for (const handle of handles) {
+    try {
+      // Search for recent tweets from this handle
+      const query = `from:${handle} -is:retweet`;
+      const res = await client.v2.search(query, {
+        "tweet.fields": ["created_at", "author_id", "text"],
+        "user.fields": ["username"],
+        expansions: ["author_id"],
+        max_results: 10,
+        start_time: since,
+      });
+
+      if (!res.data?.data) continue;
+
+      const users = res.includes?.users || [];
+      for (const tweet of res.data.data) {
+        const user = users.find((u) => u.id === tweet.author_id);
+        results.push({
+          id: tweet.id,
+          text: tweet.text,
+          author: user?.username || handle,
+          created_at: tweet.created_at || new Date().toISOString(),
+        });
+      }
+    } catch (e) {
+      console.warn(`  Could not fetch tweets from @${handle}: ${(e as Error).message}`);
+    }
+  }
+
+  return results;
 }

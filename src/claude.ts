@@ -260,3 +260,54 @@ Write a reply.`;
 
   return callClaude(system, user);
 }
+
+// ── Monitor scoring ───────────────────────────────────────────────────────────
+
+export interface ScoredTweet {
+  id: string;
+  text: string;
+  author: string;
+  score: number;       // 0-10
+  worthy: boolean;     // score >= 7
+  reason: string;
+}
+
+export async function scoreMonitoredTweets(
+  tweets: Array<{ id: string; text: string; author: string }>
+): Promise<ScoredTweet[]> {
+  if (tweets.length === 0) return [];
+
+  const formatted = tweets
+    .map((t, i) => `${i + 1}. [id:${t.id}] @${t.author}: "${t.text}"`)
+    .join("\n");
+
+  const system = `You score tweets from NFL insiders for quote-tweet worthiness by a Seahawks fan account.
+
+Score each tweet 0-10:
+- 9-10: Breaking Seahawks news (trade, signing, injury, draft pick)
+- 7-8: Interesting Seahawks analysis, roster move, or strong take worth reacting to
+- 5-6: General NFL news tangentially relevant to Seahawks
+- 0-4: Unrelated to Seahawks, generic NFL filler, or not post-worthy
+
+Return ONLY valid JSON array:
+[{ "id": "...", "score": 8, "reason": "one sentence why" }]
+No markdown, no explanation.`;
+
+  const result = await callClaude(system, `Score these tweets:\n${formatted}`);
+
+  try {
+    const parsed = JSON.parse(result);
+    return parsed.map((item: { id: string; score: number; reason: string }) => {
+      const original = tweets.find((t) => t.id === item.id);
+      return {
+        ...original,
+        score: item.score,
+        worthy: item.score >= 7,
+        reason: item.reason,
+      };
+    });
+  } catch {
+    console.warn("Failed to parse tweet scores, skipping monitored accounts");
+    return tweets.map((t) => ({ ...t, score: 0, worthy: false, reason: "parse error" }));
+  }
+}

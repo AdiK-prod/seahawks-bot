@@ -1,8 +1,13 @@
 import fs from "fs";
 import path from "path";
 import { fetchArticles } from "./sources";
-import { generateTweet, generateQuoteTweet, QuoteTweetSource } from "./claude";
-import { postTweet, quoteTweet } from "./twitter";
+import {
+  generateTweet,
+  generateQuoteTweet,
+  QuoteTweetSource,
+  scoreMonitoredTweets,
+} from "./claude";
+import { postTweet, quoteTweet, getRecentTweetsFromAccounts } from "./twitter";
 import {
   isArticleNew,
   markArticlesSeen,
@@ -22,30 +27,22 @@ const LOG_DIR = path.join(process.cwd(), "logs");
 
 function createLogger() {
   if (!fs.existsSync(LOG_DIR)) fs.mkdirSync(LOG_DIR, { recursive: true });
-
   const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
   const logPath = path.join(LOG_DIR, `tweet-${timestamp}.md`);
   const lines: string[] = [];
-
-  const log = (line = "") => {
-    console.log(line);
-    lines.push(line);
-  };
-
+  const log = (line = "") => { console.log(line); lines.push(line); };
   const save = () => {
     fs.writeFileSync(logPath, lines.join("\n"), "utf-8");
     console.log(`\n📋 Log saved: logs/tweet-${timestamp}.md`);
   };
-
-  return { log, save, logPath };
+  return { log, save };
 }
 
 // ── Similarity ────────────────────────────────────────────────────────────────
 
 function tokenize(text: string): Set<string> {
   return new Set(
-    text
-      .toLowerCase()
+    text.toLowerCase()
       .replace(/[^a-z0-9\u0590-\u05ff\s]/g, "")
       .split(/\s+/)
       .filter((w) => w.length > 3)
@@ -73,14 +70,24 @@ function isTooSimilarToRecent(candidate: string, log: (s?: string) => void): boo
   return false;
 }
 
+// ── Config ────────────────────────────────────────────────────────────────────
+
+function getMonitoredAccounts(): Array<{ handle: string; name: string }> {
+  try {
+    const config = JSON.parse(fs.readFileSync(path.join(process.cwd(), "sources.json"), "utf-8"));
+    return config.monitored_accounts || [];
+  } catch {
+    return [];
+  }
+}
+
 // ── Main ──────────────────────────────────────────────────────────────────────
 
 async function main() {
   const { log, save } = createLogger();
 
-  const runAt = new Date().toISOString();
   log(`# 🦅 Seahawks Bot — Tweet Log`);
-  log(`**Run:** ${runAt}${DRY_RUN ? " [DRY RUN]" : ""}`);
+  log(`**Run:** ${new Date().toISOString()}${DRY_RUN ? " [DRY RUN]" : ""}`);
   log();
   log("---");
 
@@ -88,14 +95,12 @@ async function main() {
   let language: string;
   let tweetId: string | undefined;
 
-  // ── Quote tweet mode ────────────────────────────────────────────────────────
+  // ── Manual quote tweet mode ──────────────────────────────────────────────────
   if (QUOTE_TWEET_ID && QUOTE_TWEET_TEXT) {
     log();
-    log("## Mode: Quote Tweet");
+    log("## Mode: Manual Quote Tweet");
     log(`**Quoting:** "${QUOTE_TWEET_TEXT}"${QUOTE_TWEET_AUTHOR ? ` by @${QUOTE_TWEET_AUTHOR}` : ""}`);
 
-    log();
-    log("## Generating via Claude...");
     const source: QuoteTweetSource = {
       tweetId: QUOTE_TWEET_ID,
       tweetText: QUOTE_TWEET_TEXT,
@@ -105,37 +110,108 @@ async function main() {
     tweetText = generated.text;
     language = generated.language;
 
-    log();
-    log("## Result");
     log(`- **Language:** ${language}`);
-    log(`- **Length:** ${tweetText.length} chars`);
     log(`- **Tweet:** "${tweetText}"`);
 
-    if (DRY_RUN) {
+    if (DRY_RUN) { log("\n⏭ DRY RUN — not posted."); save(); return; }
+
+    tweetId = await quoteTweet(tweetText, QUOTE_TWEET_ID);
+    log(`- ✓ **Posted:** https://twitter.com/i/web/status/${tweetId}`);
+
+  } else {
+
+    // ── Step 1: Check monitored accounts ──────────────────────────────────────
+    const accounts = getMonitoredAccounts();
+    log();
+    log("## [1/4] Monitored Accounts");
+    log(`Checking **${accounts.length}** accounts: ${accounts.map(a => `@${a.handle}`).join(", ")}`);
+
+    let quotedFromMonitor = false;
+
+    if (accounts.length > 0) {
+      const handles = accounts.map((a) => a.handle);
+      const recentTweets = await getRecentTweetsFromAccounts(handles, 3);
+      log(`- Found **${recentTweets.length}** tweets in the last 3 hours`);
+
+      if (recentTweets.length > 0) {
+        log();
+        log("### Scoring tweets:");
+        const scored = await scoreMonitoredTweets(recentTweets);
+        const worthy = scored
+          .filter((t) => t.worthy)
+          .sort((a, b) => b.score - a.score);
+
+        scored.forEach((t) => {
+          log(`- @${t.author} [${t.score}/10]: "${t.text.slice(0, 80)}…" — ${t.reason}`);
+        });
+
+        if (worthy.length > 0) {
+          const best = worthy[0];
+          log();
+          log(`### Best quote target: @${best.author} (score: ${best.score}/10)`);
+          log(`> "${best.text}"`);
+
+          // Check if already quoted
+          const alreadyQuoted = getRecentTweets(48).some((t) =>
+            t.text.includes(best.id) || jaccardSimilarity(t.text, best.text) > 0.5
+          );
+
+          if (alreadyQuoted) {
+            log("- ⏭ Already quoted this tweet recently, skipping.");
+          } else {
+            log("\n### Generating quote tweet...");
+            const source: QuoteTweetSource = {
+              tweetId: best.id,
+              tweetText: best.text,
+              tweetAuthor: best.author,
+            };
+            const generated = await generateQuoteTweet(source);
+            tweetText = generated.text;
+            language = generated.language;
+
+            log(`- **Language:** ${language}`);
+            log(`- **Tweet:** "${tweetText}"`);
+
+            if (!isTooSimilarToRecent(tweetText, log)) {
+              if (DRY_RUN) {
+                log("\n⏭ DRY RUN — would quote-tweet above.");
+              } else {
+                tweetId = await quoteTweet(tweetText, best.id);
+                log(`- ✓ **Quote-tweeted:** https://twitter.com/i/web/status/${tweetId}`);
+                quotedFromMonitor = true;
+
+                addPostedTweet({
+                  id: tweetId,
+                  text: tweetText,
+                  posted_at: new Date().toISOString(),
+                  engaged_comment_ids: [],
+                });
+              }
+            }
+          }
+        } else {
+          log("- No tweets scored ≥7 — nothing worth quoting.");
+        }
+      }
+    }
+
+    if (quotedFromMonitor) {
       log();
-      log("⏭ DRY RUN — not posted.");
+      log("## Quote tweet posted — skipping news tweet this run.");
+      log("\n---\n✓ Done.");
       save();
       return;
     }
 
-    tweetId = await quoteTweet(tweetText, QUOTE_TWEET_ID);
-    log(`- **Posted:** https://twitter.com/i/web/status/${tweetId}`);
-
-  // ── Regular tweet mode ──────────────────────────────────────────────────────
-  } else {
+    // ── Step 2: Regular news tweet ─────────────────────────────────────────────
     log();
-    log("## Mode: Regular Tweet from News");
-
-    log();
-    log("## [1/3] News Sources");
+    log("## [2/4] News Sources");
     const articles = await fetchArticles();
     const freshArticles = articles.filter((a) => a.link && isArticleNew(a.link));
-    log(`- Total articles fetched: **${articles.length}**`);
-    log(`- New (unseen) articles: **${freshArticles.length}**`);
+    log(`- Total: **${articles.length}**, New: **${freshArticles.length}**`);
 
     if (freshArticles.length === 0) {
-      log();
-      log("⏭ No new stories — skipping.");
+      log("\n⏭ No new stories — skipping.");
       save();
       return;
     }
@@ -145,48 +221,41 @@ async function main() {
     freshArticles.slice(0, 6).forEach((a, i) => {
       log(`${i + 1}. **[${a.source}]** ${a.title}`);
       log(`   ${a.content.slice(0, 120)}…`);
-      log(`   ${a.link}`);
     });
 
     log();
-    log("## [2/3] Claude Generation");
+    log("## [3/4] Claude Generation");
     const generated = await generateTweet(freshArticles);
     tweetText = generated.text;
     language = generated.language;
 
-    log(`- **Language decided:** ${language}`);
-    log(`- **Tone used:** ${generated.tone || "from sources.json"}`);
+    log(`- **Language:** ${language}`);
+    log(`- **Tone:** ${generated.tone}`);
     log();
     log("### Reasoning:");
-    log(generated.reasoning || "_No reasoning returned_");
+    log(generated.reasoning || "_none_");
     log();
     log("### Generated tweet:");
     log(`> ${tweetText}`);
-    log(`- **Length:** ${tweetText.length}/280 chars`);
+    log(`- **Length:** ${tweetText.length}/280`);
 
     if (tweetText.length > 280) {
-      log();
-      log("❌ Tweet too long — aborting.");
+      log("\n❌ Too long — aborting.");
       save();
       process.exit(1);
     }
 
     log();
-    log("## [3/3] Similarity Check");
-    const recentTweets = getRecentTweets(48);
-    log(`- Comparing against **${recentTweets.length}** tweets from the last 48h`);
-
+    log("## [4/4] Similarity Check");
     if (isTooSimilarToRecent(tweetText, log)) {
-      log();
-      log("⏭ Skipped — too similar to a recent tweet.");
+      log("\n⏭ Skipped — too similar to recent tweet.");
       save();
       return;
     }
     log("- ✓ Unique enough to post");
 
     if (DRY_RUN) {
-      log();
-      log("⏭ DRY RUN — not posted.");
+      log("\n⏭ DRY RUN — not posted.");
       save();
       return;
     }
@@ -197,15 +266,15 @@ async function main() {
     log(`- ✓ **Posted:** https://twitter.com/i/web/status/${tweetId}`);
 
     markArticlesSeen(freshArticles.slice(0, 8).map((a) => a.link));
-  }
 
-  if (tweetId) {
-    addPostedTweet({
-      id: tweetId,
-      text: tweetText,
-      posted_at: new Date().toISOString(),
-      engaged_comment_ids: [],
-    });
+    if (tweetId) {
+      addPostedTweet({
+        id: tweetId,
+        text: tweetText,
+        posted_at: new Date().toISOString(),
+        engaged_comment_ids: [],
+      });
+    }
   }
 
   log();
