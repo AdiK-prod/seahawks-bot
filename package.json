@@ -8,7 +8,9 @@
     "tweet": "ts-node src/tweet.ts",
     "engage": "ts-node src/engage.ts",
     "dry-tweet": "DRY_RUN=true ts-node src/tweet.ts",
-    "dry-engage": "DRY_RUN=true ts-node src/engage.ts"
+    "dry-engage": "DRY_RUN=true ts-node src/engage.ts",
+    "grade-engagement": "ts-node src/engage-grades.ts",
+    "rewrite-voice": "ts-node src/rewrite-voice.ts"
   },
   "dependencies": {
     "rss-parser": "^3.13.0",

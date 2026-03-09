@@ -5,3 +5,4 @@ dist/
 
 # Keep voice profile, ignore raw tweet data (personal)
 voice/my-tweets.txt
+raw-data/

@@ -1,0 +1,30 @@
+name: 🧠 Rewrite Voice Profile
+
+on:
+  workflow_dispatch:
+
+jobs:
+  rewrite:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - run: npm ci
+
+      - name: Rewrite voice profile
+        run: npm run rewrite-voice
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+
+      - name: Commit updated voice profile
+        run: |
+          git config user.name  "seahawks-bot[bot]"
+          git config user.email "bot@noreply.github.com"
+          git add voice/
+          git diff --staged --quiet || git commit -m "chore: rewrite voice profile based on engagement [skip ci]"
+          git push origin main || (git pull --rebase origin main && git push origin main)

@@ -45,5 +45,6 @@
     "NFL",
     "Hawks"
   ],
-  "tweet_tone": "analytical"
+  "tweet_tone": "analytical",
+  "preserve_raw_data": true
 }
