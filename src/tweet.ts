@@ -18,8 +18,10 @@ import {
   saveRawData,
   RawTweetData,
 } from "./state";
+import { addTweetRecord } from "./tweets-db";
 
-const DRY_RUN = process.env.DRY_RUN === "true";
+const DRY_RUN   = process.env.DRY_RUN   === "true";
+const FORCE_RUN = process.env.FORCE_RUN === "true";
 const QUOTE_TWEET_ID    = process.env.QUOTE_TWEET_ID;
 const QUOTE_TWEET_TEXT  = process.env.QUOTE_TWEET_TEXT;
 const QUOTE_TWEET_AUTHOR = process.env.QUOTE_TWEET_AUTHOR;
@@ -96,10 +98,11 @@ function isWithinILHours(): boolean {
 // ── Main ──────────────────────────────────────────────────────────────────────
 
 async function main() {
-  if (!DRY_RUN && !isWithinILHours()) {
+  if (!DRY_RUN && !FORCE_RUN && !isWithinILHours()) {
     console.log("Outside IL active hours (08:00–22:00) — skipping.");
     return;
   }
+  if (FORCE_RUN) console.log("⚡ FORCE_RUN — bypassing IL hours check");
 
   const { log, save } = createLogger();
   const runAt = new Date().toISOString();
@@ -198,6 +201,22 @@ async function main() {
                   engaged_comment_ids: [],
                   predicted_grade: grade.score,
                   predicted_grade_reason: grade.reason,
+                });
+
+                addTweetRecord({
+                  id: tweetId,
+                  text: tweetText,
+                  posted_at: runAt,
+                  type: "quote",
+                  quoted_tweet_id: best.id,
+                  quoted_author: best.author,
+                  tone: "quote",
+                  reasoning: `Quote of @${best.author} (score: ${best.score}/10): ${best.reason}`,
+                  articles_used: [],
+                  predicted_grade: grade.score,
+                  predicted_grade_reason: grade.reason,
+                  predicted_grade_strengths: grade.strengths,
+                  predicted_grade_weaknesses: grade.weaknesses,
                 });
               } else {
                 log("\n⏭ DRY RUN — would quote-tweet above.");
@@ -319,6 +338,25 @@ async function main() {
       predicted_grade: grade.score,
       predicted_grade_reason: grade.reason,
       raw_data_file: rawFile || undefined,
+    });
+
+    // Save to dedicated tweets DB
+    addTweetRecord({
+      id: tweetId,
+      text: tweetText,
+      posted_at: runAt,
+      type: "single",
+      tone: generated.tone,
+      reasoning: generated.reasoning,
+      articles_used: freshArticles.slice(0, 8).map(a => ({
+        title: a.title,
+        source: a.source,
+        link: a.link,
+      })),
+      predicted_grade: grade.score,
+      predicted_grade_reason: grade.reason,
+      predicted_grade_strengths: grade.strengths,
+      predicted_grade_weaknesses: grade.weaknesses,
     });
   }
 

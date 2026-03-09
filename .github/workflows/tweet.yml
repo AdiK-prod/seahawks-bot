@@ -15,6 +15,12 @@ on:
         description: "Tweet ID to quote (optional)"
         required: false
         default: ""
+      force_run:
+        description: "Force run outside IL hours (for testing)"
+        required: false
+        default: "false"
+        type: choice
+        options: ["true", "false"]
       quote_tweet_text:
         description: "Text of the tweet being quoted"
         required: false
