@@ -1,69 +1,84 @@
-// Triggered manually or after feedback: rewrites voice-profile.md based on top/low performers
+/**
+ * rewrite-voice.ts
+ * Triggered manually from Sources Manager → "Rewrite Voice Profile" button,
+ * or can be automated once enough graded tweets exist.
+ * 
+ * Reads tweets-db.json → finds top/low performers → Claude rewrites voice-profile.md
+ */
 
 import fs from "fs";
 import path from "path";
-import { getAllTweets } from "./state";
+import { getTopAndLowPerformers, getAllTweets } from "./tweets-db";
 import { rewriteVoiceProfile } from "./claude";
 
 const VOICE_PATH = path.join(process.cwd(), "voice/voice-profile.md");
-const MIN_TWEETS = 5; // need at least this many graded tweets
-
-function combinedScore(t: { actual_grade?: number; manual_rating?: number; predicted_grade?: number }): number {
-  if (t.actual_grade !== undefined && t.manual_rating !== undefined)
-    return (t.actual_grade + t.manual_rating) / 2;
-  return t.actual_grade ?? t.manual_rating ?? t.predicted_grade ?? 5;
-}
+const MIN_GRADED = 5; // minimum graded tweets before rewrite makes sense
 
 async function main() {
   console.log("\n🧠 VOICE PROFILE REWRITE JOB");
   console.log("─".repeat(40));
 
-  const tweets = getAllTweets().filter((t) =>
+  const allTweets = getAllTweets();
+  const gradedTweets = allTweets.filter(t =>
     t.actual_grade !== undefined || t.manual_rating !== undefined
   );
 
-  console.log(`  ${tweets.length} graded tweets available`);
+  console.log(`  Total bot tweets: ${allTweets.length}`);
+  console.log(`  Graded tweets:    ${gradedTweets.length}`);
 
-  if (tweets.length < MIN_TWEETS) {
-    console.log(`  Need at least ${MIN_TWEETS} graded tweets — skipping.`);
+  if (gradedTweets.length < MIN_GRADED) {
+    console.log(`\n  Need at least ${MIN_GRADED} graded tweets to rewrite — skipping.`);
+    console.log(`  Currently have ${gradedTweets.length}. Keep posting and grading!\n`);
     return;
   }
 
-  const sorted = [...tweets].sort((a, b) => combinedScore(b) - combinedScore(a));
-  const topTweets = sorted.slice(0, 5).map((t) => ({
-    text: t.text,
-    score: combinedScore(t),
-    notes: t.manual_notes,
-  }));
-  const lowTweets = sorted.slice(-5).map((t) => ({
-    text: t.text,
-    score: combinedScore(t),
-    notes: t.manual_notes,
-  }));
+  const { top, low } = getTopAndLowPerformers(5);
 
   console.log("\n  Top performers:");
-  topTweets.forEach((t) => console.log(`    [${t.score.toFixed(1)}] "${t.text.slice(0, 80)}…"`));
+  top.forEach(t => {
+    const score = t.actual_grade ?? t.manual_rating ?? t.predicted_grade;
+    console.log(`    [${score}/10] "${t.text.slice(0, 80)}…"`);
+    if (t.manual_notes) console.log(`           Note: "${t.manual_notes}"`);
+  });
+
   console.log("\n  Low performers:");
-  lowTweets.forEach((t) => console.log(`    [${t.score.toFixed(1)}] "${t.text.slice(0, 80)}…"`));
+  low.forEach(t => {
+    const score = t.actual_grade ?? t.manual_rating ?? t.predicted_grade;
+    console.log(`    [${score}/10] "${t.text.slice(0, 80)}…"`);
+    if (t.manual_notes) console.log(`           Note: "${t.manual_notes}"`);
+  });
 
   const currentProfile = fs.existsSync(VOICE_PATH)
     ? fs.readFileSync(VOICE_PATH, "utf-8")
-    : "No existing profile.";
+    : "No existing profile — create from scratch.";
 
-  console.log("\n  Rewriting voice profile via Claude...");
-  const newProfile = await rewriteVoiceProfile(currentProfile, topTweets, lowTweets);
+  console.log("\n  Calling Claude to rewrite voice profile...");
 
-  // Back up old profile
-  const backupPath = VOICE_PATH.replace(".md", `-backup-${Date.now()}.md`);
-  if (fs.existsSync(VOICE_PATH)) fs.copyFileSync(VOICE_PATH, backupPath);
+  const topForClaude = top.map(t => ({
+    text:  t.text,
+    score: t.actual_grade ?? t.manual_rating ?? t.predicted_grade,
+    notes: t.manual_notes,
+  }));
+  const lowForClaude = low.map(t => ({
+    text:  t.text,
+    score: t.actual_grade ?? t.manual_rating ?? t.predicted_grade,
+    notes: t.manual_notes,
+  }));
+
+  const newProfile = await rewriteVoiceProfile(currentProfile, topForClaude, lowForClaude);
+
+  // Back up existing profile
+  if (fs.existsSync(VOICE_PATH)) {
+    const backup = VOICE_PATH.replace(".md", `-backup-${Date.now()}.md`);
+    fs.copyFileSync(VOICE_PATH, backup);
+    console.log(`  Backed up → ${path.basename(backup)}`);
+  }
 
   fs.writeFileSync(VOICE_PATH, newProfile, "utf-8");
-  console.log("  ✓ voice-profile.md rewritten");
-  console.log(`  Backup: ${path.basename(backupPath)}`);
-  console.log("\n✓ Done.\n");
+  console.log("  ✓ voice/voice-profile.md rewritten\n");
 }
 
-main().catch((e) => {
+main().catch(e => {
   console.error("Fatal error:", e.message);
   process.exit(1);
 });
