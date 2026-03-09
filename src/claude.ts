@@ -74,7 +74,9 @@ Output ONLY one word: "hebrew" or "english"`;
 // ── Tweet generation ──────────────────────────────────────────────────────────
 
 export interface GeneratedTweet {
-  text: string;
+  type: "single" | "thread";
+  text: string;           // first tweet (or only tweet)
+  thread?: string[];      // all tweets if type === "thread"
   language: "hebrew" | "english";
   tone: string;
   reasoning: string;
@@ -117,18 +119,50 @@ RULES:
 - Do NOT start with "אני חושב" / "I think" or "In my opinion"
 - Pick ONE angle — don't try to cover everything
 ${languageInstruction}
+- Decide if the story warrants a single tweet or a thread (2-5 tweets) based on complexity.
 - Output your response in this exact format:
+
+For a single tweet:
 REASONING: (1-2 sentences: which story you picked and why, what angle you chose)
-TWEET: (the tweet text only)`;
+TYPE: single
+TWEET: (the tweet text only)
+
+For a thread:
+REASONING: (1-2 sentences: which story you picked and why, what angle you chose)
+TYPE: thread
+TWEET_1: (first tweet — the hook)
+TWEET_2: (second tweet)
+TWEET_3: (third tweet, if needed)
+TWEET_4: (fourth tweet, if needed)
+TWEET_5: (fifth tweet, if needed)
+
+Rules:
+- Each tweet must be under 280 characters
+- Thread tweet 1 should work as a standalone hook
+- Use a thread when the story has multiple angles, context, or your take needs more than 280 chars
+- Most stories should be single tweets`;
 
   const user = `Today's NFL/Seahawks news:\n${digest}\n\nWrite a tweet with a sharp opinion on the most interesting story.`;
 
   const raw = await callClaude(system, user);
-  const reasoningMatch = raw.match(/REASONING:\s*(.+?)\n?TWEET:/s);
-  const tweetMatch = raw.match(/TWEET:\s*([\s\S]+)$/);
+  const reasoningMatch = raw.match(/REASONING:\s*(.+?)\nTYPE:/s);
+  const typeMatch = raw.match(/TYPE:\s*(single|thread)/);
   const reasoning = reasoningMatch ? reasoningMatch[1].trim() : "";
+  const type = typeMatch ? typeMatch[1] as "single" | "thread" : "single";
+
+  if (type === "thread") {
+    const tweets: string[] = [];
+    for (let i = 1; i <= 5; i++) {
+      const m = raw.match(new RegExp(`TWEET_${i}:\s*([^\n]+(?:\n(?!TWEET_)[^\n]+)*)`));
+      if (m) tweets.push(m[1].trim());
+    }
+    const text = tweets[0] || raw.trim();
+    return { type: "thread", text, thread: tweets, language, tone: getTweetTone(), reasoning };
+  }
+
+  const tweetMatch = raw.match(/TWEET:\s*([\s\S]+)$/);
   const text = tweetMatch ? tweetMatch[1].trim() : raw.trim();
-  return { text, language, tone: getTweetTone(), reasoning };
+  return { type: "single", text, language, tone: getTweetTone(), reasoning };
 }
 
 // ── Quote tweet generation ────────────────────────────────────────────────────
@@ -172,7 +206,7 @@ ${languageInstruction}
   const user = `Tweet${author} being quoted:\n"${source.tweetText}"\n\nWrite a quote-tweet reaction.`;
 
   const text = await callClaude(system, user);
-  return { text, language, tone: getTweetTone(), reasoning: "" };
+  return { type: "single" as const, text, language, tone: getTweetTone(), reasoning: "" };
 }
 
 // ── Comment classification ────────────────────────────────────────────────────
@@ -310,4 +344,60 @@ No markdown, no explanation.`;
     console.warn("Failed to parse tweet scores, skipping monitored accounts");
     return tweets.map((t) => ({ ...t, score: 0, worthy: false, reason: "parse error" }));
   }
+}
+
+// ── Tweet grading ─────────────────────────────────────────────────────────────
+
+export interface TweetGrade {
+  score: number;      // 1-10
+  reason: string;     // one sentence
+  strengths: string[];
+  weaknesses: string[];
+}
+
+export async function gradeTweet(tweetText: string, context: string): Promise<TweetGrade> {
+  const system = `You are a social media expert grading a Seahawks fan account tweet for predicted engagement.
+
+Grade on a 1-10 scale based on:
+- Emotional hook and shareability
+- Specificity and insight (not generic)
+- Voice and personality
+- Timeliness and relevance
+- Call to opinion / debate potential
+
+Return ONLY valid JSON:
+{ "score": 7, "reason": "one sentence summary", "strengths": ["...", "..."], "weaknesses": ["..."] }`;
+
+  const result = await callClaude(system, `Tweet: "${tweetText}"\nContext: ${context}`);
+  try {
+    const clean = result.replace(/\`\`\`json|\`\`\`/g, "").trim();
+    return JSON.parse(clean);
+  } catch {
+    return { score: 5, reason: "Could not parse grade", strengths: [], weaknesses: [] };
+  }
+}
+
+// ── Voice profile rewriter ────────────────────────────────────────────────────
+
+export async function rewriteVoiceProfile(
+  currentProfile: string,
+  topTweets: Array<{ text: string; score: number; notes?: string }>,
+  lowTweets: Array<{ text: string; score: number; notes?: string }>
+): Promise<string> {
+  const system = `You are rewriting a Twitter voice profile for a Seahawks fan account based on performance data.
+The profile guides how the bot writes tweets. Make it specific, actionable, and pattern-based.
+Return ONLY the updated markdown profile text — no preamble.`;
+
+  const user = `Current profile:
+${currentProfile}
+
+Top performing tweets (keep doing this):
+${topTweets.map(t => `- [${t.score}/10] "${t.text}"${t.notes ? ` (note: ${t.notes})` : ""}`).join("\n")}
+
+Low performing tweets (avoid this):
+${lowTweets.map(t => `- [${t.score}/10] "${t.text}"${t.notes ? ` (note: ${t.notes})` : ""}`).join("\n")}
+
+Rewrite the voice profile to internalize what works and avoid what doesn't.`;
+
+  return await callClaude(system, user);
 }
