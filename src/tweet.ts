@@ -83,7 +83,21 @@ function getMonitoredAccounts(): Array<{ handle: string; name: string }> {
 
 // ── Main ──────────────────────────────────────────────────────────────────────
 
+function isWithinILHours(): boolean {
+  // Israel is UTC+2 (winter) or UTC+3 (summer) — check local hour in Asia/Jerusalem
+  const now = new Date();
+  const ilHour = parseInt(
+    now.toLocaleString("en-US", { timeZone: "Asia/Jerusalem", hour: "numeric", hour12: false })
+  );
+  return ilHour >= 8 && ilHour < 23;
+}
+
 async function main() {
+  if (!DRY_RUN && !isWithinILHours()) {
+    console.log("Outside IL active hours (08:00–22:00) — skipping.");
+    return;
+  }
+
   const { log, save } = createLogger();
 
   log(`# 🦅 Seahawks Bot — Tweet Log`);

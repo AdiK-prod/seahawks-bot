@@ -2,14 +2,7 @@ name: 🦅 Tweet — Seahawks Opinion Bot
 
 on:
   schedule:
-    - cron: "0 6 * * *"    # 08:00 IL
-    - cron: "0 8 * * *"    # 10:00 IL
-    - cron: "0 10 * * *"   # 12:00 IL
-    - cron: "0 12 * * *"   # 14:00 IL
-    - cron: "0 14 * * *"   # 16:00 IL
-    - cron: "0 16 * * *"   # 18:00 IL
-    - cron: "0 18 * * *"   # 20:00 IL
-    - cron: "0 20 * * *"   # 22:00 IL
+    - cron: "0 */2 * * *"  # Every 2 hours — IL time window enforced in code
   workflow_dispatch:
     inputs:
       dry_run:
