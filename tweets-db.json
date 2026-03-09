@@ -1,1 +1,66 @@
-{"version":1,"tweets":[]}
+{
+  "version": 1,
+  "tweets": [
+    {
+      "id": "2031122336888349138",
+      "text": "הליגה לא נתנה לבירס פיק קומפנסטורי על Ian Cunningham למרות שמגיע להם. אותה ליגה שנותנת פיקים על כל מנהל קפה שעובר בין קבוצות. הכללים משתנים בהתאם למה שנוח ל-NFL, כמו תמיד",
+      "posted_at": "2026-03-09T21:37:37.764Z",
+      "type": "single",
+      "tone": "analytical",
+      "reasoning": "The Bears not getting a compensatory pick for Ian Cunningham is the most interesting angle - it shows the NFL's inconsistency in awarding comp picks and highlights how teams can get screwed by the league's arbitrary decisions.",
+      "articles_used": [
+        {
+          "title": "\n                        2026 NFL free agency live tracker: Full list of team-by-team signings and trades\n                    ",
+          "source": "CBS NFL",
+          "link": "\n                                                https://www.cbssports.com/nfl/news/nfl-free-agency-tracker-2026-full-list-signings-trades-moves/\n                    "
+        },
+        {
+          "title": "NFL free agency: From Matthew Stafford to Fernando Mendoza, early winners and losers",
+          "source": "Yahoo NFL",
+          "link": "https://sports.yahoo.com/nfl/article/nfl-free-agency-from-matthew-stafford-to-fernando-mendoza-early-winners-and-losers-213308908.html"
+        },
+        {
+          "title": "NFL ultimately didn't award Bears a third-round compensatory pick for Ian Cunningham hire",
+          "source": "Pro Football Talk",
+          "link": "https://www.nbcsports.com/nfl/profootballtalk/rumor-mill/news/nfl-ultimately-didnt-award-bears-a-third-round-compensatory-pick-for-ian-cunningham"
+        },
+        {
+          "title": "NFL ultimately didn&#39;t award Bears a third-round compensatory pick for Ian Cunningham",
+          "source": "Yahoo NFL",
+          "link": "https://sports.yahoo.com/articles/nfl-ultimately-didnt-award-bears-213248256.html"
+        },
+        {
+          "title": "Bills to sign CB Dee Alford to three-year deal",
+          "source": "Pro Football Talk",
+          "link": "https://www.nbcsports.com/nfl/profootballtalk/rumor-mill/news/bills-to-sign-cb-dee-alford-to-three-year-deal"
+        },
+        {
+          "title": "Bills to sign CB Dee Alford to three-year deal",
+          "source": "Yahoo NFL",
+          "link": "https://sports.yahoo.com/articles/bills-sign-cb-dee-alford-213140312.html"
+        },
+        {
+          "title": "\n                        Travis Kelce to return to Chiefs for 14th NFL season, signs one-year contract\n                    ",
+          "source": "CBS NFL",
+          "link": "\n                                                https://www.cbssports.com/nfl/news/travis-kelce-chiefs-return-2026/\n                    "
+        },
+        {
+          "title": "Raiders add 2 comp picks",
+          "source": "Yahoo NFL",
+          "link": "https://sports.yahoo.com/articles/raiders-add-2-comp-picks-213011084.html"
+        }
+      ],
+      "predicted_grade": 3,
+      "predicted_grade_reason": "Tweet is in Hebrew which severely limits engagement for a Seahawks fan account targeting English-speaking audience",
+      "predicted_grade_strengths": [
+        "Shows NFL rule inconsistency",
+        "Has debate potential about league favoritism"
+      ],
+      "predicted_grade_weaknesses": [
+        "Wrong language for target audience",
+        "About Bears/NFL generally not Seahawks",
+        "No clear Seahawks angle or relevance"
+      ]
+    }
+  ]
+}
