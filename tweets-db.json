@@ -247,6 +247,32 @@
         "About Bears/NFL generally not Seahawks",
         "No clear Seahawks angle or relevance"
       ]
+    },
+    {
+      "id": "2030793857810501979",
+      "text": "קלצ'ה נכנס לפרי אייג'נסי מחר אבל השאלה האמיתית לא אם הוא ימשיך לשחק. השאלה היא אם הוא מוכן לקחת פחות כסף כדי להישאר בקנזס סיטי או שהוא יבחר בפרישה על פני משחק במקום אחר. בגיל 36 עם שלוש טבעות, הוא לא צריך לחזר אחרי כלום.",
+      "posted_at": "2026-03-08T23:52:40.822Z",
+      "type": "single",
+      "tone": "unknown",
+      "reasoning": "",
+      "articles_used": [],
+      "predicted_grade": 0,
+      "predicted_grade_reason": "",
+      "predicted_grade_strengths": [],
+      "predicted_grade_weaknesses": []
+    },
+    {
+      "id": "2030782074496651582",
+      "text": "הראמס מקבלים את מקדאפי בחינם כי הם מפחדים מהמכירה הפומבית. זה לא מהלך חכם, זה פאניקה של פרונט אופיס שיודע שהקורנרבק שלהם לא יחזיק מעמד עוד שנה.",
+      "posted_at": "2026-03-08T23:05:51.450Z",
+      "type": "single",
+      "tone": "unknown",
+      "reasoning": "",
+      "articles_used": [],
+      "predicted_grade": 0,
+      "predicted_grade_reason": "",
+      "predicted_grade_strengths": [],
+      "predicted_grade_weaknesses": []
     }
   ]
 }
