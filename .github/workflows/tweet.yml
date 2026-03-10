@@ -80,9 +80,27 @@ jobs:
           git config user.email "bot@noreply.github.com"
           git fetch origin main
           git checkout origin/main -- state.json 2>/dev/null || true
+          # Merge remote tweets-db.json with local (avoid overwriting remote tweets)
+          node -e "
+            const fs = require('fs');
+            const path = 'tweets-db.json';
+            try {
+              const local  = JSON.parse(fs.readFileSync(path, 'utf-8'));
+              const remote = JSON.parse(require('child_process').execSync('git show origin/main:tweets-db.json 2>/dev/null || echo null').toString().trim() || 'null');
+              if (remote && remote.tweets) {
+                const ids = new Set(local.tweets.map(t => t.id));
+                const merged = [...local.tweets];
+                for (const t of remote.tweets) { if (!ids.has(t.id)) merged.push(t); }
+                merged.sort((a,b) => new Date(b.posted_at) - new Date(a.posted_at));
+                local.tweets = merged;
+                fs.writeFileSync(path, JSON.stringify(local, null, 2));
+                console.log('Merged tweets-db: ' + merged.length + ' total');
+              }
+            } catch(e) { console.log('tweets-db merge skipped:', e.message); }
+          "
           git add state.json tweets-db.json logs/
           git diff --staged --quiet || git commit -m "chore: update state after tweet [skip ci]"
-          git push --force-with-lease origin main
+          git push --force-with-lease origin main || (git pull --rebase origin main && git push origin main)
 
       - name: Notify on failure
         if: failure()
