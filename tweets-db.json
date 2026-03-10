@@ -2,6 +2,67 @@
   "version": 1,
   "tweets": [
     {
+      "id": "2031259901117219120",
+      "text": "Kenneth Walker נעלם ושוק הRB החופשיים נראה די דל השנה. השאלה לא רק מי יחליף אותו אלא איך סיאטל תמצא ערך כשכולם יודעים שהם נואשים. 14 מיליון לJosh Jacobs? לא נראה לי שזה החכם.",
+      "posted_at": "2026-03-10T06:44:18.855Z",
+      "type": "single",
+      "tone": "analytical",
+      "reasoning": "The Seahawks losing Kenneth Walker and needing a replacement is the most relevant story for this fan. I'll focus on the challenge of finding a good RB in free agency when the market is thin.",
+      "articles_used": [
+        {
+          "title": "Free agency will scramble NFL Draft predictions for Jeremiyah Love, Ty Simpson, Carnell Tate, 49ers and Steelers",
+          "source": "Yahoo NFL",
+          "link": "https://sports.yahoo.com/nfl/article/free-agency-will-scramble-nfl-draft-predictions-for-jeremiyah-love-ty-simpson-carnell-tate-49ers-and-steelers-055449923.html"
+        },
+        {
+          "title": "NFL Free Agency 2026: Day 1 Recap",
+          "source": "Yahoo NFL",
+          "link": "https://sports.yahoo.com/articles/nfl-free-agency-2026-day-053949567.html"
+        },
+        {
+          "title": "7 free agent options for the Seahawks to replace Kenneth Walker",
+          "source": "Yahoo NFL",
+          "link": "https://sports.yahoo.com/articles/7-free-agent-options-seahawks-053224394.html"
+        },
+        {
+          "title": "Patriots agree to terms with OL Alijah Vera-Tucker",
+          "source": "Pro Football Talk",
+          "link": "https://www.nbcsports.com/nfl/profootballtalk/rumor-mill/news/patriots-agree-to-terms-with-ol-alijah-vera-tucker"
+        },
+        {
+          "title": "Patriots agree to terms with OL Alijah Vera-Tucker",
+          "source": "Yahoo NFL",
+          "link": "https://sports.yahoo.com/articles/patriots-agree-terms-ol-alijah-041807304.html"
+        },
+        {
+          "title": "Patriots up-to-date depth chart: Who is on the roster right now?",
+          "source": "Yahoo NFL",
+          "link": "https://sports.yahoo.com/articles/patriots-date-depth-chart-roster-223841876.html"
+        },
+        {
+          "title": "Instant grades for Patriots free agency signing Alijah Vera-Tucker",
+          "source": "Yahoo NFL",
+          "link": "https://sports.yahoo.com/articles/instant-grades-patriots-free-agency-040915994.html"
+        },
+        {
+          "title": "Patriots sign guard Alijah Vera-Tucker to reported 3-year deal",
+          "source": "Yahoo NFL",
+          "link": "https://sports.yahoo.com/articles/patriots-sign-guard-alijah-vera-035625259.html"
+        }
+      ],
+      "predicted_grade": 2,
+      "predicted_grade_reason": "Tweet is in Hebrew, severely limiting engagement potential for a Seahawks fanbase that is primarily English-speaking",
+      "predicted_grade_strengths": [
+        "Shows specific knowledge of RB market and Josh Jacobs contract situation",
+        "Addresses real concern about replacement value and desperation"
+      ],
+      "predicted_grade_weaknesses": [
+        "Language barrier eliminates 95%+ of potential audience",
+        "No emotional hook or personality despite good analysis",
+        "Lacks call to action or debate invitation"
+      ]
+    },
+    {
       "id": "2031129704888152393",
       "text": "48 מיליון לקוויטי פיי? הוא בקושי הצליח להיות רלוונטי באינדיאנפוליס ועכשיו הריידרס משלמים לו כמו All-Pro. זה בדיוק למה צוותים נשארים בבנייה מחדש - משלמים מחירי פרימיום לשחקנים ממוצעים",
       "posted_at": "2026-03-09T22:06:53.882Z",
