@@ -123,12 +123,16 @@ ${languageInstruction}
 - Output your response in this exact format:
 
 For a single tweet:
-REASONING: (1-2 sentences: which story you picked and why, what angle you chose)
+REASONING_STORY: (which story you picked and why this one over others)
+REASONING_ANGLE: (what specific angle or take you chose, and what you consciously rejected)
+REASONING_TONE: (why this tone fits — what emotional register does this story call for)
 TYPE: single
 TWEET: (the tweet text only)
 
 For a thread:
-REASONING: (1-2 sentences: which story you picked and why, what angle you chose)
+REASONING_STORY: (which story you picked and why this one over others)
+REASONING_ANGLE: (what specific angle or take you chose, and what you consciously rejected)
+REASONING_TONE: (why this tone fits — what emotional register does this story call for)
 TYPE: thread
 TWEET_1: (first tweet — the hook)
 TWEET_2: (second tweet)

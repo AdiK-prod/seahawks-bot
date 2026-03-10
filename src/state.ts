@@ -20,6 +20,8 @@ export interface Article {
   link: string;
   published: string;
   source: string;
+  source_tweet_id?: string;   // tweet ID if article originated from a monitored account tweet
+  source_tweet_author?: string;
 }
 
 export interface PostedTweet {

@@ -191,7 +191,9 @@ async function main() {
             if (grade.strengths.length) log(`- **Strengths:** ${grade.strengths.join(", ")}`);
             if (grade.weaknesses.length) log(`- **Weaknesses:** ${grade.weaknesses.join(", ")}`);
 
-            if (!isTooSimilarToRecent(tweetText, log)) {
+            if (grade.score < 3.5) {
+              log(`- ⏭ Quote tweet grade too low (${grade.score}/10) — skipping.`);
+            } else if (!isTooSimilarToRecent(tweetText, log)) {
               if (!DRY_RUN) {
                 tweetId = await quoteTweet(tweetText, best.id);
                 log(`- ✓ **Quote-tweeted:** https://twitter.com/i/web/status/${tweetId}`);
@@ -243,6 +245,22 @@ async function main() {
     const articles = await fetchArticles();
     const freshArticles = articles.filter((a) => a.link && isArticleNew(a.link));
     log(`- Total: **${articles.length}**, New: **${freshArticles.length}**`);
+
+    // Enrich articles with source tweet IDs from monitored accounts (for quote-tweeting)
+    if (accounts.length > 0) {
+      const recentForEnrich = await getRecentTweetsFromAccounts(accounts.map(a => a.handle), 6);
+      for (const article of freshArticles) {
+        const match = recentForEnrich.find(t =>
+          t.text.toLowerCase().includes(article.title.toLowerCase().slice(0, 30)) ||
+          (article.link && t.text.includes(article.link.slice(-20)))
+        );
+        if (match) {
+          article.source_tweet_id    = match.id;
+          article.source_tweet_author = match.author;
+          log(`  📎 Matched article to @${match.author}'s tweet: "${match.text.slice(0, 60)}…"`);
+        }
+      }
+    }
 
     if (freshArticles.length === 0) {
       log("\n⏭ No new stories — skipping.");
@@ -299,6 +317,14 @@ async function main() {
     if (grade.strengths.length)  log(`- **Strengths:** ${grade.strengths.join(", ")}`);
     if (grade.weaknesses.length) log(`- **Weaknesses:** ${grade.weaknesses.join(", ")}`);
 
+    // ── Grade threshold check ─────────────────────────────────────────────────
+    if (grade.score < 3.5) {
+      log(`\n⏭ Grade too low (${grade.score}/10 < 3.5) — not posting.`);
+      log(`   Weaknesses: ${grade.weaknesses.join(", ")}`);
+      save();
+      return;
+    }
+
     if (DRY_RUN) {
       log("\n⏭ DRY RUN — not posted.");
       save();
@@ -306,10 +332,19 @@ async function main() {
     }
 
     // ── Post ───────────────────────────────────────────────────────────────────
-    tweetId = await postTweet(tweetText);
-    log();
-    log("## Result");
-    log(`- ✓ **Posted:** https://twitter.com/i/web/status/${tweetId}`);
+    // If the article has a source tweet, quote it instead of posting standalone
+    const sourceTweetId = freshArticles[0]?.source_tweet_id;
+    if (sourceTweetId) {
+      tweetId = await quoteTweet(tweetText, sourceTweetId);
+      log();
+      log("## Result");
+      log(`- ✓ **Quote-tweeted** @${freshArticles[0].source_tweet_author}: https://twitter.com/i/web/status/${tweetId}`);
+    } else {
+      tweetId = await postTweet(tweetText);
+      log();
+      log("## Result");
+      log(`- ✓ **Posted:** https://twitter.com/i/web/status/${tweetId}`);
+    }
 
     markArticlesSeen(freshArticles.slice(0, 8).map((a) => a.link));
 
@@ -345,7 +380,9 @@ async function main() {
       id: tweetId,
       text: tweetText,
       posted_at: runAt,
-      type: "single",
+      type: sourceTweetId ? "quote" : "single",
+      quoted_tweet_id: sourceTweetId,
+      quoted_author: freshArticles[0]?.source_tweet_author,
       tone: generated.tone,
       reasoning: generated.reasoning,
       articles_used: freshArticles.slice(0, 8).map(a => ({
