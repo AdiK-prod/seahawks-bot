@@ -2,6 +2,45 @@
   "version": 1,
   "tweets": [
     {
+      "id": "2031318495741260159",
+      "text": "(manually added)",
+      "posted_at": "2026-03-10T20:20:08.647Z",
+      "type": "single",
+      "tone": "unknown",
+      "reasoning": "",
+      "articles_used": [],
+      "predicted_grade": 0,
+      "predicted_grade_reason": "",
+      "predicted_grade_strengths": [],
+      "predicted_grade_weaknesses": []
+    },
+    {
+      "id": "2031380902069117165",
+      "text": "(manually added)",
+      "posted_at": "2026-03-10T20:20:08.647Z",
+      "type": "single",
+      "tone": "unknown",
+      "reasoning": "",
+      "articles_used": [],
+      "predicted_grade": 0,
+      "predicted_grade_reason": "",
+      "predicted_grade_strengths": [],
+      "predicted_grade_weaknesses": []
+    },
+    {
+      "id": "2031288652748185863",
+      "text": "(manually added)",
+      "posted_at": "2026-03-10T20:20:08.633Z",
+      "type": "single",
+      "tone": "unknown",
+      "reasoning": "",
+      "articles_used": [],
+      "predicted_grade": 0,
+      "predicted_grade_reason": "",
+      "predicted_grade_strengths": [],
+      "predicted_grade_weaknesses": []
+    },
+    {
       "id": "2031353434432221596",
       "text": "בנגלס מאבדים את Hendrickson ו-Ossai ועכשיו דראפטים עוד Edge במקומם. בעיה: דראפט פיקים לא מחליפים ייצור מוכח. הם יצטרכו להסתמך על Rookie שעדיין לא הוכיח כלום ברמה המקצועית.",
       "posted_at": "2026-03-10T12:55:54.486Z",
