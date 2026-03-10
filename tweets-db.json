@@ -2,6 +2,68 @@
   "version": 1,
   "tweets": [
     {
+      "id": "2031353434432221596",
+      "text": "בנגלס מאבדים את Hendrickson ו-Ossai ועכשיו דראפטים עוד Edge במקומם. בעיה: דראפט פיקים לא מחליפים ייצור מוכח. הם יצטרכו להסתמך על Rookie שעדיין לא הוכיח כלום ברמה המקצועית.",
+      "posted_at": "2026-03-10T12:55:54.486Z",
+      "type": "single",
+      "tone": "analytical",
+      "reasoning": "The Bengals drafting another edge rusher after losing Hendrickson and Ossai is the most substantive story here - it shows how teams try to replace proven production with draft picks, which rarely works seamlessly.",
+      "articles_used": [
+        {
+          "title": "After free agency splurge, Bengals draft Rueben Bain in ESPN mock.",
+          "source": "Yahoo NFL",
+          "link": "https://sports.yahoo.com/articles/free-agency-splurge-bengals-draft-124720697.html"
+        },
+        {
+          "title": "Chargers sign former Dolphins OG Cole Strange to 2-year deal",
+          "source": "Yahoo NFL",
+          "link": "https://sports.yahoo.com/articles/chargers-sign-former-dolphins-og-124455970.html"
+        },
+        {
+          "title": "The Fantasy Options Most Helped by Their Division in 2025",
+          "source": "Yahoo NFL",
+          "link": "https://sports.yahoo.com/articles/fantasy-options-most-helped-division-124229619.html"
+        },
+        {
+          "title": "\n                        2026 NFL free agency live tracker: Full list of team-by-team signings and trades\n                    ",
+          "source": "CBS NFL",
+          "link": "\n                                                https://www.cbssports.com/nfl/news/nfl-free-agency-tracker-2026-full-list-signings-trades-moves/\n                    "
+        },
+        {
+          "title": "Jumbo Package: Former Tide players make waves in NFL Free Agency",
+          "source": "Yahoo NFL",
+          "link": "https://sports.yahoo.com/articles/jumbo-package-former-tide-players-123300858.html"
+        },
+        {
+          "title": "NFL free agency grades 2026: Breaking down biggest deals, trades",
+          "source": "Yahoo NFL",
+          "link": "https://sports.yahoo.com/articles/nfl-free-agency-grades-2026-123247667.html"
+        },
+        {
+          "title": "NY Giants NFL free agency 2026: Grades for New York’s Day 1 moves",
+          "source": "Yahoo NFL",
+          "link": "https://sports.yahoo.com/articles/ny-giants-nfl-free-agency-123156853.html"
+        },
+        {
+          "title": "Alex Anzalone: The business side of football doesn't always line up with how things should go",
+          "source": "Pro Football Talk",
+          "link": "https://www.nbcsports.com/nfl/profootballtalk/rumor-mill/news/alex-anzalone-the-business-side-of-football-doesnt-always-line-up-with-how-things-should-go"
+        }
+      ],
+      "predicted_grade": 3,
+      "predicted_grade_reason": "Hebrew tweet about Bengals draft strategy lacks relevance to Seahawks fans and offers generic draft analysis",
+      "predicted_grade_strengths": [
+        "Makes valid point about draft picks vs proven production",
+        "Shows understanding of roster construction challenges"
+      ],
+      "predicted_grade_weaknesses": [
+        "Written in Hebrew for English-speaking audience",
+        "About Bengals not Seahawks",
+        "Generic draft take without unique insight",
+        "No connection to team being covered"
+      ]
+    },
+    {
       "id": "2031259901117219120",
       "text": "Kenneth Walker נעלם ושוק הRB החופשיים נראה די דל השנה. השאלה לא רק מי יחליף אותו אלא איך סיאטל תמצא ערך כשכולם יודעים שהם נואשים. 14 מיליון לJosh Jacobs? לא נראה לי שזה החכם.",
       "posted_at": "2026-03-10T06:44:18.855Z",
