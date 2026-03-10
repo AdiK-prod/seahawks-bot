@@ -2,6 +2,67 @@
   "version": 1,
   "tweets": [
     {
+      "id": "2031468111879155948",
+      "text": "הקאובויז חותמים עם P.J. Locke אחרי שדנוור לא רצו להשקיע בו - בדיוק הסוג של חתימות שמראות מי מבין איך לבנות עומק בסיפטי. דאלאס יודעים מה הם עושים בהגנה השנה",
+      "posted_at": "2026-03-10T20:31:29.195Z",
+      "type": "single",
+      "tone": "analytical",
+      "reasoning": "P.J. Locke signing with Cowboys after leaving Denver - this shows how teams prioritize different positions and budgets. Cowboys adding safety depth while Broncos let him walk shows roster construction philosophy differences.",
+      "articles_used": [
+        {
+          "title": "Cowboys agree to terms with DL Otito Ogbonnia",
+          "source": "Pro Football Talk",
+          "link": "https://www.nbcsports.com/nfl/profootballtalk/rumor-mill/news/cowboys-agree-to-terms-with-dl-otito-ogbonnia"
+        },
+        {
+          "title": "Former Broncos safety P.J. Locke will sign a 1-year deal with the Dallas Cowboys",
+          "source": "Yahoo NFL",
+          "link": "https://sports.yahoo.com/articles/former-broncos-safety-p-j-201134331.html"
+        },
+        {
+          "title": "Nahshon Wright agrees to one-year deal with Jets",
+          "source": "Pro Football Talk",
+          "link": "https://www.nbcsports.com/nfl/profootballtalk/rumor-mill/news/nahshon-wright-agrees-to-one-year-deal-with-jets"
+        },
+        {
+          "title": "Nahshon Wright agrees to one-year deal with Jets",
+          "source": "Yahoo NFL",
+          "link": "https://sports.yahoo.com/articles/nahshon-wright-agrees-one-deal-200742153.html"
+        },
+        {
+          "title": "P.J. Locke agrees to sign with Cowboys",
+          "source": "Pro Football Talk",
+          "link": "https://www.nbcsports.com/nfl/profootballtalk/rumor-mill/news/p-j-locke-agrees-to-sign-with-cowboys"
+        },
+        {
+          "title": "P.J. Locke agrees to sign with Cowboys",
+          "source": "Yahoo NFL",
+          "link": "https://sports.yahoo.com/articles/p-j-locke-agrees-sign-195829160.html"
+        },
+        {
+          "title": "OL Teven Jenkins re-signs with the Browns",
+          "source": "Pro Football Talk",
+          "link": "https://www.nbcsports.com/nfl/profootballtalk/rumor-mill/news/ol-teven-jenkins-re-signs-with-the-browns"
+        },
+        {
+          "title": "OL Teven Jenkins re-signs with the Browns",
+          "source": "Yahoo NFL",
+          "link": "https://sports.yahoo.com/articles/ol-teven-jenkins-signs-browns-195556957.html"
+        }
+      ],
+      "predicted_grade": 3,
+      "predicted_grade_reason": "Tweet is in Hebrew about Cowboys signing, not Seahawks content",
+      "predicted_grade_strengths": [
+        "Shows understanding of roster construction philosophy",
+        "Specific player transaction analysis"
+      ],
+      "predicted_grade_weaknesses": [
+        "Wrong team focus for Seahawks account",
+        "Language barrier for target audience",
+        "No Seahawks relevance or connection"
+      ]
+    },
+    {
       "id": "2031318495741260159",
       "text": "(manually added)",
       "posted_at": "2026-03-10T20:20:08.647Z",
@@ -17,6 +78,19 @@
     {
       "id": "2031380902069117165",
       "text": "(manually added)",
+      "posted_at": "2026-03-10T20:20:08.647Z",
+      "type": "single",
+      "tone": "unknown",
+      "reasoning": "",
+      "articles_used": [],
+      "predicted_grade": 0,
+      "predicted_grade_reason": "",
+      "predicted_grade_strengths": [],
+      "predicted_grade_weaknesses": []
+    },
+    {
+      "id": "2031441059063148983",
+      "text": "גינו חוזר לניו יורק אחרי שסיאטל הציאה אותו מהקבר. הוא הגיע אלינו כשחשבו שהוא גמור, עזב כקוורטרבק שיכול לזכות במשחקים. הג'טס מקבלים שחקן אחר לגמרי מזה שהכירו ב-2013.",
       "posted_at": "2026-03-10T20:20:08.647Z",
       "type": "single",
       "tone": "unknown",
