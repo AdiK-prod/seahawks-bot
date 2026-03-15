@@ -2,6 +2,68 @@
   "version": 1,
   "tweets": [
     {
+      "id": "2033188697290469455",
+      "text": "וושינגטן בלי מס מדינה זה יתרון אמיתי - שחקן שמקבל 10 מיליון בסיאטל שווה בערך 11.3 בקליפורניה. זה לא סתם פרט טכני, זה אמור להשפיע איך בונים את הסגל ומי מביאים בfree agency",
+      "posted_at": "2026-03-15T14:28:32.310Z",
+      "type": "single",
+      "tone": "analytical",
+      "reasoning": "",
+      "articles_used": [
+        {
+          "title": "Your weekly dose of Colts optimism",
+          "source": "Yahoo NFL",
+          "link": "https://sports.yahoo.com/articles/weekly-dose-colts-optimism-140024294.html"
+        },
+        {
+          "title": "Some think salary cap should take state taxes into account",
+          "source": "Pro Football Talk",
+          "link": "https://www.nbcsports.com/nfl/profootballtalk/rumor-mill/news/some-think-salary-cap-should-take-state-taxes-into-account"
+        },
+        {
+          "title": "Quay Walker is excited to be apart of the Las Vegas Raiders",
+          "source": "Yahoo NFL",
+          "link": "https://sports.yahoo.com/articles/quay-walker-excited-apart-las-140000253.html"
+        },
+        {
+          "title": "Rams 2026 NFL Draft: These day 3 prospects fit the culture",
+          "source": "Yahoo NFL",
+          "link": "https://sports.yahoo.com/articles/rams-2026-nfl-draft-day-140000426.html"
+        },
+        {
+          "title": "The Rams apparently wanted A.J. Brown, too",
+          "source": "Yahoo NFL",
+          "link": "https://sports.yahoo.com/articles/rams-apparently-wanted-j-brown-140000336.html"
+        },
+        {
+          "title": "Will Kevin O'Connell get more out of Kyler Murray?",
+          "source": "Pro Football Talk",
+          "link": "https://www.nbcsports.com/nfl/profootballtalk/rumor-mill/news/will-kevin-oconnell-get-more-out-of-kyler-murray"
+        },
+        {
+          "title": "Morstead out, Waitman in: 49ers signing former Steelers punter per report",
+          "source": "Yahoo NFL",
+          "link": "https://sports.yahoo.com/articles/morstead-waitman-49ers-signing-former-130000700.html"
+        },
+        {
+          "title": "Arizona Cardinals fans were not confident in Monti Ossenfort before free agency even started",
+          "source": "Yahoo NFL",
+          "link": "https://sports.yahoo.com/articles/arizona-cardinals-fans-were-not-130000713.html"
+        }
+      ],
+      "predicted_grade": 4,
+      "predicted_grade_reason": "Insightful financial analysis but wrong language for target audience limits engagement",
+      "predicted_grade_strengths": [
+        "Specific financial breakdown with concrete numbers",
+        "Strategic insight about roster building implications",
+        "Goes beyond surface-level observations"
+      ],
+      "predicted_grade_weaknesses": [
+        "Hebrew text severely limits reach for Seahawks fanbase",
+        "No emotional hook or team-specific examples",
+        "Lacks personality or fan voice"
+      ]
+    },
+    {
       "id": "2031468111879155948",
       "text": "הקאובויז חותמים עם P.J. Locke אחרי שדנוור לא רצו להשקיע בו - בדיוק הסוג של חתימות שמראות מי מבין איך לבנות עומק בסיפטי. דאלאס יודעים מה הם עושים בהגנה השנה",
       "posted_at": "2026-03-10T20:31:29.195Z",
