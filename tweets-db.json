@@ -2,6 +2,68 @@
   "version": 1,
   "tweets": [
     {
+      "id": "2033558431441842550",
+      "text": "הבעיה עם הרחבת ה-NFL לא כסף - זה כישרון. יש כבר 32 קבוצות ורק 15-20 קוורטרבקים ברמה של פליאוף. עוד שתי קבוצות פירושו עוד שני קוורטרבקים גרועים שמתחילים כל ראשון. המוצר נפגע.",
+      "posted_at": "2026-03-16T14:57:42.188Z",
+      "type": "single",
+      "tone": "analytical",
+      "reasoning": "",
+      "articles_used": [
+        {
+          "title": "NBA explores expanding by two teams; when will the NFL follow suit?",
+          "source": "Pro Football Talk",
+          "link": "https://www.nbcsports.com/nfl/profootballtalk/rumor-mill/news/nba-explores-expanding-by-two-teams-when-will-the-nfl-follow-suit"
+        },
+        {
+          "title": "NBA explores expanding by two teams; when will the NFL follow suit?",
+          "source": "Yahoo NFL",
+          "link": "https://sports.yahoo.com/articles/nba-explores-expanding-two-teams-144713084.html"
+        },
+        {
+          "title": "BTB Monday Discussion: Rank your top 3 free agency moves",
+          "source": "Yahoo NFL",
+          "link": "https://sports.yahoo.com/articles/btb-monday-discussion-rank-top-143000321.html"
+        },
+        {
+          "title": "Steelers mailbag callout: Post free agency edition",
+          "source": "Yahoo NFL",
+          "link": "https://sports.yahoo.com/articles/steelers-mailbag-callout-post-free-142853271.html"
+        },
+        {
+          "title": "Patriots links 3/16/26: Pats building prime secondary",
+          "source": "Yahoo NFL",
+          "link": "https://sports.yahoo.com/articles/patriots-links-3-16-26-141528028.html"
+        },
+        {
+          "title": "Bills news: Dissecting latest mock drafts after first week of free agency",
+          "source": "Yahoo NFL",
+          "link": "https://sports.yahoo.com/articles/bills-news-dissecting-latest-mock-141239672.html"
+        },
+        {
+          "title": "Bengals News (3/16): Next round of NFL Free Agency",
+          "source": "Yahoo NFL",
+          "link": "https://sports.yahoo.com/articles/bengals-news-3-16-next-140000291.html"
+        },
+        {
+          "title": "New York Jets: What Aaron Glenn likes in a draft prospect",
+          "source": "Yahoo NFL",
+          "link": "https://sports.yahoo.com/articles/york-jets-aaron-glenn-likes-140000662.html"
+        }
+      ],
+      "predicted_grade": 4,
+      "predicted_grade_reason": "Interesting NFL expansion take but written in Hebrew for a Seahawks fan account, creating major audience mismatch",
+      "predicted_grade_strengths": [
+        "Specific insight about QB talent scarcity",
+        "Debate-worthy topic about NFL expansion",
+        "Clear statistical reasoning (15-20 playoff-level QBs)"
+      ],
+      "predicted_grade_weaknesses": [
+        "Wrong language for target audience",
+        "No Seahawks connection",
+        "Generic NFL take without team-specific angle"
+      ]
+    },
+    {
       "id": "2033188697290469455",
       "text": "וושינגטן בלי מס מדינה זה יתרון אמיתי - שחקן שמקבל 10 מיליון בסיאטל שווה בערך 11.3 בקליפורניה. זה לא סתם פרט טכני, זה אמור להשפיע איך בונים את הסגל ומי מביאים בfree agency",
       "posted_at": "2026-03-15T14:28:32.310Z",
