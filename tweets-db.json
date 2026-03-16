@@ -2,6 +2,68 @@
   "version": 1,
   "tweets": [
     {
+      "id": "2033643678506320286",
+      "text": "קירק ל-49ers זה בעיקר ביטוח אחרי הפציעות של איוק ודיבו. 27 יארד ממוצע בעונה שעברה, לא בדיוק מה שיפחיד את ההגנה של סיאטל. השאלה אם זה עוזר להם יותר מאשר לחזק את הקו ההתקפי",
+      "posted_at": "2026-03-16T20:36:29.354Z",
+      "type": "single",
+      "tone": "analytical",
+      "reasoning": "",
+      "articles_used": [
+        {
+          "title": "49ers add wide receiver Christian Kirk",
+          "source": "Pro Football Talk",
+          "link": "https://www.nbcsports.com/nfl/profootballtalk/rumor-mill/news/49ers-add-wide-receiver-christian-kirk"
+        },
+        {
+          "title": "A.J. Brown trade rumors: Are Rams out on Eagles WR?",
+          "source": "Yahoo NFL",
+          "link": "https://sports.yahoo.com/articles/j-brown-trade-rumors-rams-200731747.html"
+        },
+        {
+          "title": "Patriots sign converted long snapper Niko Lalos following workout",
+          "source": "Yahoo NFL",
+          "link": "https://sports.yahoo.com/articles/patriots-sign-converted-long-snapper-193855612.html"
+        },
+        {
+          "title": "Bills Mafia doesn’t want Buffalo to trade for Maxx Crosby",
+          "source": "Yahoo NFL",
+          "link": "https://sports.yahoo.com/articles/bills-mafia-doesn-t-want-200601654.html"
+        },
+        {
+          "title": "David Montgomery gets a raise in a re-worked contract",
+          "source": "Pro Football Talk",
+          "link": "https://www.nbcsports.com/nfl/profootballtalk/rumor-mill/news/david-montgomery-gets-a-raise-in-a-re-worked-contract"
+        },
+        {
+          "title": "Steelers host two promising WR’s for pre-draft visits Monday",
+          "source": "Yahoo NFL",
+          "link": "https://sports.yahoo.com/articles/steelers-host-two-promising-wr-200000795.html"
+        },
+        {
+          "title": "How the Rashan Gary trade affects the team’s draft strategy",
+          "source": "Yahoo NFL",
+          "link": "https://sports.yahoo.com/articles/rashan-gary-trade-affects-team-200000728.html"
+        },
+        {
+          "title": "Baltimore Beatdown 2026 Draft Top 51 Big Board",
+          "source": "Yahoo NFL",
+          "link": "https://sports.yahoo.com/articles/baltimore-beatdown-2026-draft-top-200000995.html"
+        }
+      ],
+      "predicted_grade": 4,
+      "predicted_grade_reason": "Hebrew tweet about Kirk to 49ers lacks emotional hook and personality for Seahawks fan engagement",
+      "predicted_grade_strengths": [
+        "Specific statistical insight (27 yard average)",
+        "Strategic analysis comparing roster priorities"
+      ],
+      "predicted_grade_weaknesses": [
+        "Language barrier limits shareability",
+        "Lacks emotional Seahawks fan perspective",
+        "No clear call to debate or opinion",
+        "Generic analysis without passionate voice"
+      ]
+    },
+    {
       "id": "2033558431441842550",
       "text": "הבעיה עם הרחבת ה-NFL לא כסף - זה כישרון. יש כבר 32 קבוצות ורק 15-20 קוורטרבקים ברמה של פליאוף. עוד שתי קבוצות פירושו עוד שני קוורטרבקים גרועים שמתחילים כל ראשון. המוצר נפגע.",
       "posted_at": "2026-03-16T14:57:42.188Z",
